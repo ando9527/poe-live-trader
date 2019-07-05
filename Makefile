@@ -20,15 +20,16 @@ all: test build
 run:
 	$(GODOTENV) $(GOCMD) run -ldflags "-X main.version=${VERSION}" pkg/cmd/main.go
 
-launch:
-	$(GODOTENV) $(GOCMD) run -ldflags "-X main.version=${VERSION}" cmd/${PROJECT}.go -launch
+build: cp
+	$(GOBUILD) -o build/${PROJECT}.exe -ldflags "-X main.version=${VERSION}" pkg/cmd/main.go
 
-build:
-		$(GOBUILD) -o build/${PROJECT} -ldflags "-X ${PROJECT}.version=${VERSION}" cmd/main.go
 test:
-		$(GODOTENV) $(GOTEST) -v ./...
+	$(GODOTENV) $(GOTEST) -v ./...
 clean:
 		rm -rf ./build
+
+cp:
+	cp audio.wav build/
 
 deps:
 	go mod download
@@ -40,3 +41,5 @@ dockerbuild:
 dockerpush:
 	docker push gcr.io/eve-vpn/${PROJECT}:${VERSION}
 	docker push gcr.io/eve-vpn/${PROJECT}:latest
+
+.PHONY: build

@@ -10,6 +10,7 @@ require (
 	github.com/gobwas/pool v0.2.0 // indirect
 	github.com/gobwas/ws v1.0.2 // indirect
 	github.com/gorilla/websocket v1.4.0
+	github.com/joho/godotenv v1.3.0 // indirect
 	github.com/jroimartin/gocui v0.4.0 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/mattn/go-colorable v0.1.2 // indirect
