@@ -53,6 +53,9 @@ func reconnect() (conn *websocket.Conn) {
 		} else {
 			logrus.Fatal("dial:", err)
 		}
+		logrus.Info("Reconnect in 5 sec..")
+		time.Sleep(5 * time.Second)
+		logrus.Info("Reconnecting...")
 	}
 
 }
