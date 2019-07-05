@@ -47,7 +47,7 @@ func Connect(itemHandler ItemHandler) {
 
 	urlPath := fmt.Sprintf("/api/trade/live/%s/%s", conf.Env.League, conf.Env.Filter)
 
-	u := url.URL{Scheme: "ws", Host: "www.pathofexile.com", Path: urlPath}
+	u := url.URL{Scheme: "wss", Host: "www.pathofexile.com", Path: urlPath}
 	log.Printf("connecting to %s", u.String())
 
 	header := getHeader()
