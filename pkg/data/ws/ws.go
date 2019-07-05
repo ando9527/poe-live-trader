@@ -39,23 +39,29 @@ type LiveData struct {
 }
 type ItemHandler func(itemID []string) (itemDetail http2.ItemDetail)
 
-func Connect(itemHandler ItemHandler) {
-	log.SetFlags(0)
-
-	interrupt := make(chan os.Signal, 1)
-	signal.Notify(interrupt, os.Interrupt)
-
+func reconnect() (conn *websocket.Conn) {
 	urlPath := fmt.Sprintf("/api/trade/live/%s/%s", conf.Env.League, conf.Env.Filter)
 
 	u := url.URL{Scheme: "wss", Host: "www.pathofexile.com", Path: urlPath}
 	logrus.Infof("connecting to %s", u.String())
 
 	header := getHeader()
-	c, _, err := websocket.DefaultDialer.Dial(u.String(), header)
-
-	if err != nil {
-		logrus.Fatal("dial:", err)
+	for {
+		c, _, err := websocket.DefaultDialer.Dial(u.String(), header)
+		if err == nil {
+			return c
+		} else {
+			logrus.Fatal("dial:", err)
+		}
 	}
+
+}
+func Connect(itemHandler ItemHandler) {
+	log.SetFlags(0)
+
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt)
+	c := reconnect()
 	logrus.Info("websocket server connected, start receiving message.. ")
 	defer c.Close()
 
