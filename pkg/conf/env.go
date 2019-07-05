@@ -6,21 +6,21 @@ import (
 )
 
 var (
-	Config Configuration
+	Env EnvironmentVariable
 )
 
 func init() {
-	Config = NewConfig()
+	Env = NewConfig()
 }
 
-type Configuration struct {
+type EnvironmentVariable struct {
 	League    string `required:"true" split_words:"true"`
 	Poesessid string `required:"true" split_words:"true"`
 	Filter    string `required:"true" split_words:"true"`
 }
 
 // NewConfig Initialize Configuration
-func NewConfig() (c Configuration) {
+func NewConfig() (c EnvironmentVariable) {
 	err := envconfig.Process("app", &c)
 	if err != nil {
 		logrus.Fatal(err.Error())
