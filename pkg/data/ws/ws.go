@@ -53,12 +53,7 @@ func Connect(itemHandler ItemHandler) {
 	if err != nil {
 		logrus.Fatal("dial:", err)
 	}
-	defer func() {
-		err := c.Close()
-		if err != nil {
-			logrus.Warnf("ws connection close error, message: %s", err)
-		}
-	}()
+	defer c.Close()
 
 	done := make(chan struct{})
 	go func() {
