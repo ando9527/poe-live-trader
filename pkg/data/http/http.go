@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -76,7 +77,7 @@ func GetItemDetail(itemID []string) (itemDetail ItemDetail) {
 		logrus.Fatalf("Get item detail from url failed, url: %s", url)
 	}
 	if resp == nil || resp.Body == nil {
-		return itemDetail
+		log.Fatalf("http response is nil, url: %s", url)
 	}
 	defer resp.Body.Close()
 	itemDetail = ItemDetail{}
