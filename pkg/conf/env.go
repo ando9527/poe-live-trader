@@ -14,9 +14,10 @@ func init() {
 }
 
 type EnvironmentVariable struct {
-	League    string `required:"true" split_words:"true"`
-	Poesessid string `required:"true" split_words:"true"`
-	Filter    string `required:"true" split_words:"true"`
+	League    string  `required:"true" split_words:"true"`
+	Poesessid string  `required:"true" split_words:"true"`
+	Filter    string  `required:"true" split_words:"true"`
+	Volume    float64 `required:"true" split_words:"true"`
 }
 
 // NewConfig Initialize Configuration
