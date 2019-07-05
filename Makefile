@@ -24,7 +24,7 @@ launch:
 	$(GODOTENV) $(GOCMD) run -ldflags "-X main.version=${VERSION}" cmd/${PROJECT}.go -launch
 
 build:
-		$(GOBUILD) -o build/${PROJECT} -ldflags "-X ${PROJECT}.version=${VERSION}" cmd/${PROJECT}.go
+		$(GOBUILD) -o build/${PROJECT} -ldflags "-X ${PROJECT}.version=${VERSION}" cmd/main.go
 test:
 		$(GODOTENV) $(GOTEST) -v ./...
 clean:
