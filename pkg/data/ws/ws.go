@@ -10,6 +10,8 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/atotto/clipboard"
+
 	http2 "github.com/ando9527/poe-live-trader/pkg/data/http"
 
 	"github.com/sirupsen/logrus"
@@ -73,6 +75,11 @@ func Connect(itemHandler ItemHandler) {
 			itemDetail := itemHandler(liveData.New)
 			for _, result := range itemDetail.Result {
 				logrus.Info(result.Listing.Whisper)
+				err := clipboard.WriteAll(result.Listing.Whisper)
+				if err != nil {
+					logrus.Warn("failed copy whisper to clipboard.")
+				}
+				//audio.Play()
 			}
 		}
 	}()
