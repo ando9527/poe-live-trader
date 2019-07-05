@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -21,20 +20,23 @@ var (
 	version  string
 )
 
+func pause() {
+	fmt.Print("Press 'Enter' to continue...")
+	_, _ = bufio.NewReader(os.Stdin).ReadBytes('\n')
+}
+
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
-		fmt.Print("Press 'Enter' to continue...")
-		bufio.NewReader(os.Stdin).ReadBytes('\n')
+		logrus.Error("Error loading .env file")
+		pause()
 		return
 	}
 	err = conf.InitConfig()
 	if err != nil {
 		logrus.Error(err)
 		logrus.Error("Please setup .env file properly")
-		fmt.Print("Press 'Enter' to continue...")
-		bufio.NewReader(os.Stdin).ReadBytes('\n')
+		pause()
 		return
 	}
 
@@ -43,6 +45,5 @@ func main() {
 	conf.InitLogger(logLevel)
 	logrus.Infof("Poe Live Trader %s", version)
 	ws.Connect(http.GetItemDetail)
-	fmt.Print("Press 'Enter' to continue...")
-	bufio.NewReader(os.Stdin).ReadBytes('\n')
+
 }

@@ -69,6 +69,8 @@ func Connect(itemHandler ItemHandler) {
 	defer c.Close()
 
 	done := make(chan struct{})
+
+	// Read Message
 	go func() {
 		defer close(done)
 		for {
