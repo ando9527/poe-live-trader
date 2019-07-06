@@ -93,10 +93,6 @@ func Connect(itemHandler ItemHandler) {
 				}
 				audio.Play()
 			}
-			select {
-			case <-ctx.Done():
-				return
-			}
 		}
 	}(ctx)
 
