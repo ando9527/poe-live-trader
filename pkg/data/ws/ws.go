@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -60,21 +61,19 @@ func reconnect() (conn *websocket.Conn) {
 
 }
 func Connect(itemHandler ItemHandler) {
-	log.SetFlags(0)
 
-	interrupt := make(chan os.Signal, 1)
-	signal.Notify(interrupt, os.Interrupt)
-	c := reconnect()
+	ctx, cancel := context.WithCancel(context.Background())
+
+	// Connect to Server
+	conn := reconnect()
 	logrus.Info("websocket server connected, start receiving message.. ")
-	defer c.Close()
-
-	done := make(chan struct{})
+	defer conn.Close()
 
 	// Read Message
-	go func() {
-		defer close(done)
+	go func(ctx2 context.Context) {
+		defer cancel()
 		for {
-			_, message, err := c.ReadMessage()
+			_, message, err := conn.ReadMessage()
 			if err != nil {
 				logrus.Error("websocket read message error: ", err)
 				return
@@ -94,35 +93,29 @@ func Connect(itemHandler ItemHandler) {
 				}
 				audio.Play()
 			}
+			select {
+			case <-ctx.Done():
+				return
+			}
 		}
-	}()
+	}(ctx)
 
-	ticker := time.NewTicker(time.Second)
-	defer ticker.Stop()
-
+	// Cleanly close the connection by sending a close message and then
+	// waiting (with timeout) for the server to close the connection.
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt)
 	for {
 		select {
-		case <-done:
-			return
-		case _ = <-ticker.C:
-			//log.Println("Send Yolo")
-			//err := c.WriteMessage(websocket.TextMessage, []byte(string("yolo")))
-			//if err != nil {
-			//	log.Println("write:", err)
-			//	return
-			//}
 		case <-interrupt:
-			log.Println("interrupt")
+			log.Println("interrupt, sending close signal to ws server")
 
-			// Cleanly close the connection by sending a close message and then
-			// waiting (with timeout) for the server to close the connection.
-			err := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+			err := conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 			if err != nil {
 				log.Println("write close:", err)
 				return
 			}
+			cancel()
 			select {
-			case <-done:
 			case <-time.After(time.Second):
 			}
 			return
