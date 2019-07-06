@@ -84,15 +84,18 @@ func Connect(itemHandler ItemHandler) {
 			if err != nil {
 				logrus.Fatalf("decode json message from ws server failed, message: %s", message)
 			}
-			itemDetail := itemHandler(liveData.New)
-			for _, result := range itemDetail.Result {
-				fmt.Println(result.Listing.Whisper)
-				err := clipboard.WriteAll(result.Listing.Whisper)
-				if err != nil {
-					logrus.Warn("failed copy whisper to clipboard.")
+			go func() {
+				itemDetail := itemHandler(liveData.New)
+				for _, result := range itemDetail.Result {
+					fmt.Println(result.Listing.Whisper)
+					err := clipboard.WriteAll(result.Listing.Whisper)
+					if err != nil {
+						logrus.Warn("failed copy whisper to clipboard.")
+					}
+					audio.Play()
 				}
-				audio.Play()
-			}
+			}()
+
 		}
 	}(ctx)
 
