@@ -1,4 +1,4 @@
-package ws
+package client
 
 import (
 	"context"
@@ -56,6 +56,7 @@ func reconnect() (conn *websocket.Conn) {
 	}
 
 }
+
 func Connect(itemHandler ItemHandler) {
 
 	ctx, cancel := context.WithCancel(context.Background())
