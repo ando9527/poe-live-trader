@@ -42,11 +42,11 @@ func main() {
 	flag.Parse()
 	conf.InitLogger(logLevel)
 	logrus.Infof("Poe Live Trader %s", version)
-	//client.Launch(client.GetItemDetail)
+
 	client := client2.NewClient()
 	client.ReConnect()
 
-	h := &client2.HandlerV1{}
-	client.ReadMessage(nil, h)
-	select {}
+	h := &client2.Handler{}
+	client.ReadMessage(h)
+	client.NotifyDC()
 }

@@ -72,29 +72,9 @@ type ItemDetail struct {
 	} `json:"result"`
 }
 
-func GetItemDetail(itemID []string) (itemDetail ItemDetail) {
+type Handler struct{}
 
-	url := fmt.Sprintf("https://www.pathofexile.com/api/trade/fetch/%s?query=%s", strings.Join(itemID, ","), conf.Env.Filter)
-	resp, err := http.Get(url)
-	if err != nil {
-		logrus.Fatalf("Get item detail from url failed, url: %s", url)
-	}
-	if resp == nil || resp.Body == nil {
-		log.Fatalf("http response is nil, url: %s", url)
-	}
-	defer resp.Body.Close()
-	itemDetail = ItemDetail{}
-	err = json.NewDecoder(resp.Body).Decode(&itemDetail)
-
-	if err != nil {
-		logrus.Fatalf("failed to decode json of item detail, url: %s", url)
-	}
-	return itemDetail
-}
-
-type HandlerV1 struct{}
-
-func (h *HandlerV1) ConvertJSON(message string) (liveData LiveData) {
+func (h *Handler) ConvertJSON(message string) (liveData LiveData) {
 	liveData = LiveData{}
 	err := json.Unmarshal([]byte(message), &liveData)
 	if err != nil {
@@ -103,7 +83,7 @@ func (h *HandlerV1) ConvertJSON(message string) (liveData LiveData) {
 	return liveData
 }
 
-func (h *HandlerV1) GetItemDetail(itemID []string) (itemDetail ItemDetail) {
+func (h *Handler) GetItemDetail(itemID []string) (itemDetail ItemDetail) {
 	url := fmt.Sprintf("https://www.pathofexile.com/api/trade/fetch/%s?query=%s", strings.Join(itemID, ","), conf.Env.Filter)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -122,7 +102,7 @@ func (h *HandlerV1) GetItemDetail(itemID []string) (itemDetail ItemDetail) {
 	return itemDetail
 }
 
-func (h *HandlerV1) Do(message string) {
+func (h *Handler) Do(message string) {
 	go func() {
 		liveData := h.ConvertJSON(message)
 		itemDetail := h.GetItemDetail(liveData.New)

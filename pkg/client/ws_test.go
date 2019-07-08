@@ -1,7 +1,6 @@
 package client
 
 import (
-	"bytes"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -38,6 +37,22 @@ func (m *MockServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type FakeHandler struct {
+	Message string
+}
+
+func (f *FakeHandler) ConvertJSON(message string) (liveData LiveData) {
+	return liveData
+}
+
+func (f *FakeHandler) GetItemDetail(itemID []string) (itemDetail ItemDetail) {
+	return itemDetail
+}
+
+func (f *FakeHandler) Do(message string) {
+	f.Message = message
+}
+
 func TestClient_ReConnect(t *testing.T) {
 	// mock server initialize
 	mockServer := &MockServer{websocket.Upgrader{}, ""}
@@ -72,9 +87,8 @@ func TestReadMessage(t *testing.T) {
 	if err := client.Conn.WriteMessage(websocket.TextMessage, []byte(want)); err != nil {
 		panic(err)
 	}
-
-	receive := bytes.Buffer{}
-	client.ReadMessage(&receive, nil)
+	fake := &FakeHandler{}
+	client.ReadMessage(fake)
 	time.Sleep(10 * time.Millisecond)
-	assert.Equal(t, want, receive.String())
+	assert.Equal(t, want, fake.Message)
 }
