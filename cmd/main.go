@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ando9527/poe-live-trader/pkg/client"
+	client2 "github.com/ando9527/poe-live-trader/pkg/client"
 
 	"github.com/ando9527/poe-live-trader/conf"
 	"github.com/joho/godotenv"
@@ -42,6 +42,11 @@ func main() {
 	flag.Parse()
 	conf.InitLogger(logLevel)
 	logrus.Infof("Poe Live Trader %s", version)
-	client.Launch(client.GetItemDetail)
+	//client.Launch(client.GetItemDetail)
+	client := client2.NewClient()
+	client.ReConnect()
 
+	h := &client2.HandlerV1{}
+	client.ReadMessage(nil, h)
+	select {}
 }

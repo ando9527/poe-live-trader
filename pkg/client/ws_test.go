@@ -74,7 +74,7 @@ func TestReadMessage(t *testing.T) {
 	}
 
 	receive := bytes.Buffer{}
-	client.ReadMessage(&receive)
+	client.ReadMessage(&receive, nil)
 	time.Sleep(10 * time.Millisecond)
 	assert.Equal(t, want, receive.String())
 }

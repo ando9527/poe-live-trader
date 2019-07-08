@@ -35,11 +35,23 @@ func getHeader() (header http.Header) {
 type LiveData struct {
 	New []string `json:"new"`
 }
-type ItemHandler func(itemID []string) (itemDetail ItemDetail)
+
+type ItemHandler interface {
+	ConvertJSON(message string) (liveData LiveData)
+	GetItemDetail(itemID []string) (itemDetail ItemDetail)
+	Do(message string)
+}
+
+type ItemHandlerOld func(itemID []string) (itemDetail ItemDetail)
 
 type Client struct {
 	ServerURL string
 	Conn      *websocket.Conn
+}
+
+func NewClient() (client *Client) {
+	client = &Client{GetServerURL(), nil}
+	return client
 }
 
 func GetServerURL() (serverURL string) {
@@ -65,16 +77,23 @@ func (c *Client) ReConnect() {
 	}
 }
 
-func (c *Client) ReadMessage(w io.Writer) {
+func (c *Client) ReadMessage(w io.Writer, handler ItemHandler) {
 
 	go func() {
 		for {
 			_, message, err := c.Conn.ReadMessage()
-			fmt.Fprint(w, string(message))
+			if w != nil {
+				if _, err := fmt.Fprint(w, string(message)); err != nil {
+					panic(err)
+				}
+			}
+
 			if err != nil {
 				logrus.Error("websocket read message error: ", err)
 				return
 			}
+
+			handler.Do(string(message))
 		}
 	}()
 }
@@ -100,7 +119,7 @@ func reconnect() (conn *websocket.Conn) {
 
 }
 
-func Launch(itemHandler ItemHandler) {
+func Launch(itemHandler ItemHandlerOld) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
