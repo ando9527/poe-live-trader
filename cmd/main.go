@@ -42,6 +42,6 @@ func main() {
 	flag.Parse()
 	conf.InitLogger(logLevel)
 	logrus.Infof("Poe Live Trader %s", version)
-	client.Connect(client.GetItemDetail)
+	client.Launch(client.GetItemDetail)
 
 }

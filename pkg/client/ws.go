@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -36,6 +37,48 @@ type LiveData struct {
 }
 type ItemHandler func(itemID []string) (itemDetail ItemDetail)
 
+type Client struct {
+	ServerURL string
+	Conn      *websocket.Conn
+}
+
+func GetServerURL() (serverURL string) {
+	urlPath := fmt.Sprintf("/api/trade/live/%s/%s", conf.Env.League, conf.Env.Filter)
+	u := url.URL{Scheme: "wss", Host: "www.pathofexile.com", Path: urlPath}
+	logrus.Infof("connecting to %s", u.String())
+	return u.String()
+}
+
+func (c *Client) ReConnect() {
+	header := getHeader()
+	for {
+		conn, _, err := websocket.DefaultDialer.Dial(c.ServerURL, header)
+		if err == nil {
+			c.Conn = conn
+			return
+		} else {
+			logrus.Fatal("dial:", err)
+		}
+		logrus.Info("Reconnect in 5 sec..")
+		time.Sleep(5 * time.Second)
+		logrus.Info("Reconnecting...")
+	}
+}
+
+func (c *Client) ReadMessage(w io.Writer) {
+
+	go func() {
+		for {
+			_, message, err := c.Conn.ReadMessage()
+			fmt.Fprint(w, string(message))
+			if err != nil {
+				logrus.Error("websocket read message error: ", err)
+				return
+			}
+		}
+	}()
+}
+
 func reconnect() (conn *websocket.Conn) {
 	urlPath := fmt.Sprintf("/api/trade/live/%s/%s", conf.Env.League, conf.Env.Filter)
 
@@ -57,11 +100,11 @@ func reconnect() (conn *websocket.Conn) {
 
 }
 
-func Connect(itemHandler ItemHandler) {
+func Launch(itemHandler ItemHandler) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	// Connect to Server
+	// Launch to Server
 	conn := reconnect()
 	logrus.Info("websocket server connected, start receiving message.. ")
 	defer conn.Close()
