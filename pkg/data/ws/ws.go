@@ -11,15 +11,11 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/atotto/clipboard"
-
+	"github.com/ando9527/poe-live-trader/conf"
 	"github.com/ando9527/poe-live-trader/pkg/audio"
-	http2 "github.com/ando9527/poe-live-trader/pkg/data/http"
-
-	"github.com/sirupsen/logrus"
-
-	"github.com/ando9527/poe-live-trader/pkg/conf"
+	"github.com/atotto/clipboard"
 	"github.com/gorilla/websocket"
+	"github.com/sirupsen/logrus"
 )
 
 func getHeader() (header http.Header) {
@@ -38,7 +34,7 @@ func getHeader() (header http.Header) {
 type LiveData struct {
 	New []string `json:"new"`
 }
-type ItemHandler func(itemID []string) (itemDetail http2.ItemDetail)
+type ItemHandler func(itemID []string) (itemDetail ItemDetail)
 
 func reconnect() (conn *websocket.Conn) {
 	urlPath := fmt.Sprintf("/api/trade/live/%s/%s", conf.Env.League, conf.Env.Filter)

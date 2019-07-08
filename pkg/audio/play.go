@@ -5,14 +5,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/sirupsen/logrus"
-
-	"github.com/ando9527/poe-live-trader/pkg/conf"
-
+	"github.com/ando9527/poe-live-trader/conf"
 	"github.com/faiface/beep"
 	"github.com/faiface/beep/effects"
 	"github.com/faiface/beep/speaker"
 	"github.com/faiface/beep/wav"
+	"github.com/sirupsen/logrus"
 )
 
 func Play() {

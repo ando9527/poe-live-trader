@@ -1,4 +1,4 @@
-package http
+package ws
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ando9527/poe-live-trader/pkg/conf"
+	"github.com/ando9527/poe-live-trader/conf"
 	"github.com/sirupsen/logrus"
 )
 

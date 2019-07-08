@@ -6,13 +6,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/joho/godotenv"
-
-	"github.com/sirupsen/logrus"
-
-	"github.com/ando9527/poe-live-trader/pkg/conf"
-	"github.com/ando9527/poe-live-trader/pkg/data/http"
+	"github.com/ando9527/poe-live-trader/conf"
 	"github.com/ando9527/poe-live-trader/pkg/data/ws"
+	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -44,6 +41,6 @@ func main() {
 	flag.Parse()
 	conf.InitLogger(logLevel)
 	logrus.Infof("Poe Live Trader %s", version)
-	ws.Connect(http.GetItemDetail)
+	ws.Connect(ws.GetItemDetail)
 
 }
