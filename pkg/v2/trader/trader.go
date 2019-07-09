@@ -5,7 +5,8 @@ import (
 	"net/http"
 
 	"github.com/ando9527/poe-live-trader/conf"
-	"github.com/ando9527/poe-live-trader/pkg/v2/types"
+	"github.com/ando9527/poe-live-trader/pkg/v2/request"
+	"github.com/ando9527/poe-live-trader/pkg/v2/ws"
 )
 
 func getHeader() (header http.Header) {
@@ -23,23 +24,30 @@ func getHeader() (header http.Header) {
 
 type Trader struct {
 	Whisper         chan string
-	WebsocketClient *WebsocketClient
-	RequestClient   *RequestClient
+	WebsocketClient *ws.Client
+	RequestClient   *request.Client
 }
 
 func NewTrader() (t *Trader) {
 	t = &Trader{}
 	t.Whisper = make(chan string)
-	t.WebsocketClient = NewWebsocketClient()
-	t.RequestClient = NewRequestClient()
+	t.WebsocketClient = ws.NewWebsocketClient()
+	t.RequestClient = request.NewRequestClient()
 
 	// get item id from websocket server
 	itemID := t.WebsocketClient.GetItemID()
-	// get detail of item from http server
-	itemDetail := t.RequestClient.RequestItemDetail(itemID)
 	go func() {
-		for _, result := range itemDetail.Result {
-			t.Whisper <- result.Listing.Whisper
+		for {
+			select {
+			case result := <-itemID:
+				// get detail of item from http server
+				go func() {
+					itemDetail := t.RequestClient.RequestItemDetail(result)
+					for _, result := range itemDetail.Result {
+						t.Whisper <- result.Listing.Whisper
+					}
+				}()
+			}
 		}
 	}()
 	return t
@@ -47,26 +55,4 @@ func NewTrader() (t *Trader) {
 
 func (c *Trader) GetWhisper() (whisper chan string) {
 	return c.Whisper
-}
-
-type RequestClient struct {
-}
-
-func (client *RequestClient) RequestItemDetail(strings []string) (itemDetail types.ItemDetail) {
-	return itemDetail
-}
-
-func NewRequestClient() (client *RequestClient) {
-	return &RequestClient{}
-}
-
-type WebsocketClient struct {
-}
-
-func (client *WebsocketClient) GetItemID() []string {
-	return nil
-}
-
-func NewWebsocketClient() (client *WebsocketClient) {
-	return &WebsocketClient{}
 }

@@ -15,6 +15,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/nsf/termbox-go v0.0.0-20190624072549-eeb6cd0a1762 // indirect
+	github.com/pkg/errors v0.8.1
 	github.com/raphael/wsc v0.0.0-20170911225637-e6ff0dd6988a // indirect
 	github.com/sacOO7/go-logger v0.0.0-20180719173527-9ac9add5a50d // indirect
 	github.com/sacOO7/gowebsocket v0.0.0-20180719182212-1436bb906a4e // indirect
