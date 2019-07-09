@@ -1,18 +1,7 @@
-package client
+package types
 
 import (
-	"encoding/json"
-	"fmt"
-	"log"
-	"net/http"
-	"strings"
 	"time"
-
-	"github.com/ando9527/poe-live-trader/pkg/audio"
-	"github.com/atotto/clipboard"
-
-	"github.com/ando9527/poe-live-trader/conf"
-	"github.com/sirupsen/logrus"
 )
 
 type ItemDetail struct {
@@ -70,59 +59,4 @@ type ItemDetail struct {
 			} `json:"extended"`
 		} `json:"item"`
 	} `json:"result"`
-}
-
-type Handler struct {
-}
-
-func (h *Handler) ConvertJSON(message string) (liveData LiveData) {
-	liveData = LiveData{}
-	err := json.Unmarshal([]byte(message), &liveData)
-	if err != nil {
-		logrus.Fatalf("decode json message from ws server failed, message: %s", message)
-	}
-	return liveData
-}
-
-func GetHTTPServerURL(itemID []string) (serverURL string) {
-	return fmt.Sprintf("https://www.pathofexile.com/api/trade/fetch/%s?query=%s", strings.Join(itemID, ","), conf.Env.Filter)
-}
-func (h *Handler) GetItemDetail(url string) (itemDetail ItemDetail) {
-	resp, err := http.Get(url)
-	if err != nil {
-		logrus.Fatalf("Get item detail from url failed, url: %s", url)
-	}
-	if resp == nil || resp.Body == nil {
-		log.Fatalf("http response is nil, url: %s", url)
-	}
-	defer resp.Body.Close()
-	itemDetail = ItemDetail{}
-	err = json.NewDecoder(resp.Body).Decode(&itemDetail)
-
-	if err != nil {
-		logrus.Fatalf("failed to decode json of item detail, url: %s", url)
-	}
-	return itemDetail
-}
-
-func (h *Handler) Do(message string) {
-	go func() {
-		// convert message to json
-		liveData := h.ConvertJSON(message)
-
-		// get item detail through http request
-		url := GetHTTPServerURL(liveData.New)
-		itemDetail := h.GetItemDetail(url)
-
-		for _, result := range itemDetail.Result {
-			fmt.Println(result.Listing.Whisper)
-			// copy to clipboard
-			err := clipboard.WriteAll(result.Listing.Whisper)
-			if err != nil {
-				logrus.Warn("failed copy whisper to clipboard.")
-			}
-			// sound alert
-			audio.Play()
-		}
-	}()
 }
