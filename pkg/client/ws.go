@@ -33,7 +33,7 @@ type LiveData struct {
 
 type ItemHandler interface {
 	ConvertJSON(message string) (liveData LiveData)
-	GetItemDetail(itemID []string) (itemDetail ItemDetail)
+	GetItemDetail(url string) (itemDetail ItemDetail)
 	Do(message string)
 }
 
