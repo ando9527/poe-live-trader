@@ -72,7 +72,8 @@ type ItemDetail struct {
 	} `json:"result"`
 }
 
-type Handler struct{}
+type Handler struct {
+}
 
 func (h *Handler) ConvertJSON(message string) (liveData LiveData) {
 	liveData = LiveData{}
@@ -83,8 +84,10 @@ func (h *Handler) ConvertJSON(message string) (liveData LiveData) {
 	return liveData
 }
 
-func (h *Handler) GetItemDetail(itemID []string) (itemDetail ItemDetail) {
-	url := fmt.Sprintf("https://www.pathofexile.com/api/trade/fetch/%s?query=%s", strings.Join(itemID, ","), conf.Env.Filter)
+func GetHTTPServerURL(itemID []string) (serverURL string) {
+	return fmt.Sprintf("https://www.pathofexile.com/api/trade/fetch/%s?query=%s", strings.Join(itemID, ","), conf.Env.Filter)
+}
+func (h *Handler) GetItemDetail(url string) (itemDetail ItemDetail) {
 	resp, err := http.Get(url)
 	if err != nil {
 		logrus.Fatalf("Get item detail from url failed, url: %s", url)
@@ -104,14 +107,21 @@ func (h *Handler) GetItemDetail(itemID []string) (itemDetail ItemDetail) {
 
 func (h *Handler) Do(message string) {
 	go func() {
+		// convert message to json
 		liveData := h.ConvertJSON(message)
-		itemDetail := h.GetItemDetail(liveData.New)
+
+		// get item detail through http request
+		url := GetHTTPServerURL(liveData.New)
+		itemDetail := h.GetItemDetail(url)
+
 		for _, result := range itemDetail.Result {
 			fmt.Println(result.Listing.Whisper)
+			// copy to clipboard
 			err := clipboard.WriteAll(result.Listing.Whisper)
 			if err != nil {
 				logrus.Warn("failed copy whisper to clipboard.")
 			}
+			// sound alert
 			audio.Play()
 		}
 	}()
