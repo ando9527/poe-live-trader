@@ -37,7 +37,7 @@ func TestTrader_GetWhisper(t *testing.T) {
 	for {
 		select {
 		case <-time.After(duration):
-			assert.Error(t, errors.New("timeout"))
+			t.Error(errors.New("timeout"))
 		case actual := <-client.Whisper:
 			assert.Equal(t, expect, actual)
 			return

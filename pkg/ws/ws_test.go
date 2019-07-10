@@ -27,7 +27,7 @@ func TestClient_GetItemID(t *testing.T) {
 		assert.Equal(t, expect, actual)
 		return
 	case <-time.After(time.Millisecond * 60):
-		assert.Error(t, errors.New("timeout"))
+		t.Error(errors.New("timeout"))
 	}
 
 }
