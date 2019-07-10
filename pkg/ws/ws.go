@@ -24,7 +24,7 @@ type Client struct {
 }
 
 func (client *Client) ReadMessage() {
-	go func(IDList chan []string) {
+	go func() {
 		itemID := types.ItemID{}
 		for {
 			_, bytes, err := client.Conn.ReadMessage()
@@ -41,7 +41,7 @@ func (client *Client) ReadMessage() {
 			client.ItemID <- itemID.New
 		}
 
-	}(client.ItemID)
+	}()
 }
 
 func (client *Client) ReConnect() {
