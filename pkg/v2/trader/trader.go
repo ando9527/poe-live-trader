@@ -38,14 +38,12 @@ func NewTrader() (t *Trader) {
 func (t *Trader) Launch() {
 	t.WebsocketClient.ReConnect()
 	t.WebsocketClient.NotifyDC()
-	defer t.WebsocketClient.Conn.Close()
 
 	// get item id from websocket server
-	itemID := t.WebsocketClient.GetItemID()
 	go func() {
 		for {
 			select {
-			case result := <-itemID:
+			case result := <-t.WebsocketClient.ItemID:
 				// get detail of item from http server
 				go func() {
 					itemDetail := t.RequestClient.RequestItemDetail(result)
@@ -57,7 +55,4 @@ func (t *Trader) Launch() {
 		}
 	}()
 
-}
-func (c *Trader) GetWhisper() (whisper chan string) {
-	return c.Whisper
 }

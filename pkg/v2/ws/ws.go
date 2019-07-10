@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -9,7 +10,9 @@ import (
 	"time"
 
 	"github.com/ando9527/poe-live-trader/conf"
+	"github.com/ando9527/poe-live-trader/pkg/v2/types"
 	"github.com/gorilla/websocket"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 )
@@ -20,17 +23,36 @@ type Client struct {
 	ServerURL string
 }
 
-func (client *Client) GetItemID() (itemID chan []string) {
-	return itemID
+func (client *Client) ReadMessage() {
+	go func(IDList chan []string) {
+		itemID := types.ItemID{}
+		for {
+			_, bytes, err := client.Conn.ReadMessage()
+			if err != nil {
+				log.Error(errors.Wrap(err, "websocket read message error"))
+				return
+			}
+			log.Debug("Receive: ", string(bytes))
+
+			err = json.Unmarshal(bytes, &itemID)
+			if err != nil {
+				panic(err)
+			}
+			client.ItemID <- itemID.New
+		}
+
+	}(client.ItemID)
 }
-func (c *Client) ReConnect() {
+
+func (client *Client) ReConnect() {
 	header := getHeader()
 	for {
-		logrus.Infof("Connecting to %s", c.ServerURL)
-		conn, _, err := websocket.DefaultDialer.Dial(c.ServerURL, header)
+		logrus.Infof("Connecting to %s", client.ServerURL)
+		conn, _, err := websocket.DefaultDialer.Dial(client.ServerURL, header)
 		if err == nil {
 			log.Info("Connected websocket server!")
-			c.Conn = conn
+			client.Conn = conn
+			client.ReadMessage()
 			return
 		} else {
 			logrus.Fatal("dial:", err)
@@ -39,6 +61,7 @@ func (c *Client) ReConnect() {
 		time.Sleep(5 * time.Second)
 		logrus.Info("Reconnecting...")
 	}
+
 }
 
 func NewWebsocketClient() (client *Client) {
@@ -50,7 +73,6 @@ func NewWebsocketClient() (client *Client) {
 func getServerURL() (serverUrl string) {
 	urlPath := fmt.Sprintf("/api/trade/live/%s/%s", conf.Env.League, conf.Env.Filter)
 	u := url.URL{Scheme: "wss", Host: "www.pathofexile.com", Path: urlPath}
-
 	return u.String()
 }
 
@@ -67,7 +89,7 @@ func getHeader() (header http.Header) {
 	return header
 }
 
-func (c *Client) NotifyDC() {
+func (client *Client) NotifyDC() {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
@@ -77,7 +99,7 @@ func (c *Client) NotifyDC() {
 			case <-interrupt:
 				log.Println("interrupt, sending close signal to ws server")
 
-				err := c.Conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+				err := client.Conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 				if err != nil {
 					log.Println("write close:", err)
 					return

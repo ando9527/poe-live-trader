@@ -28,17 +28,20 @@ func TestTrader_GetWhisper(t *testing.T) {
 	client := &Trader{}
 	client.RequestClient = fakeRequestClient
 	client.WebsocketClient = fakeWSClient
+	client.Whisper = make(chan string)
 
 	// start testing
 	client.Launch()
-	w := client.GetWhisper()
 	expect := "@Taranis__R_n_B___Legion Hi, I would like to buy your Exalted Orb listed for 166 chaos in Legion (stash tab \"GG\"; position: left 12, top 1)"
 	duration := time.Duration(20 * time.Millisecond)
-	select {
-	case <-time.After(duration):
-		assert.Error(t, errors.New("timeout"))
-	case actual := <-w:
-		assert.Equal(t, expect, actual)
+	for {
+		select {
+		case <-time.After(duration):
+			assert.Error(t, errors.New("timeout"))
+		case actual := <-client.Whisper:
+			assert.Equal(t, expect, actual)
+			return
+		}
 	}
 
 }

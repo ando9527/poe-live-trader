@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/ando9527/poe-live-trader/pkg/audio"
 	"github.com/ando9527/poe-live-trader/pkg/v2/trader"
+	"github.com/atotto/clipboard"
 
 	"github.com/ando9527/poe-live-trader/conf"
 	"github.com/joho/godotenv"
@@ -45,10 +47,17 @@ func main() {
 
 	client := trader.NewTrader()
 	client.Launch()
-	whisper := client.GetWhisper()
-
-	select {
-	case result := <-whisper:
-		fmt.Println(result)
+	whisper := client.Whisper
+	for {
+		select {
+		case result := <-whisper:
+			fmt.Println(result)
+			audio.Play()
+			err := clipboard.WriteAll(result)
+			if err != nil {
+				logrus.Warn("failed copy whisper to clipboard.")
+			}
+		}
 	}
+
 }

@@ -1,13 +1,17 @@
 package ws
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
+
+func init() {
+	log.SetLevel(log.DebugLevel)
+}
 
 func TestClient_GetItemID(t *testing.T) {
 	server := FakeWebsocketServer()
@@ -19,11 +23,9 @@ func TestClient_GetItemID(t *testing.T) {
 	defer client.Conn.Close()
 
 	select {
-	case actual := <-client.GetItemID():
-		fmt.Println("yolo")
-		fmt.Println(actual)
-		fmt.Println("wat")
+	case actual := <-client.ItemID:
 		assert.Equal(t, expect, actual)
+		return
 	case <-time.After(time.Millisecond * 60):
 		assert.Error(t, errors.New("timeout"))
 	}

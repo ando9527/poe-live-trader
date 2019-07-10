@@ -23,6 +23,7 @@ require (
 	github.com/stretchr/testify v1.2.2
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	golang.org/x/net v0.0.0-20190628185345-da137c7871d7
+	gotest.tools v2.2.0+incompatible // indirect
 	howl.moe/claws v0.0.0-20190224172428-2cdc641875d8 // indirect
 	howl.moe/nanojson v0.1.0 // indirect
 	nhooyr.io/websocket v1.3.0 // indirect

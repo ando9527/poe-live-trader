@@ -60,3 +60,7 @@ type ItemDetail struct {
 		} `json:"item"`
 	} `json:"result"`
 }
+
+type ItemID struct {
+	New []string `json:"new"`
+}
