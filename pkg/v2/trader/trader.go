@@ -33,6 +33,12 @@ func NewTrader() (t *Trader) {
 	t.Whisper = make(chan string)
 	t.WebsocketClient = ws.NewWebsocketClient()
 	t.RequestClient = request.NewRequestClient()
+	return t
+}
+func (t *Trader) Launch() {
+	t.WebsocketClient.ReConnect()
+	t.WebsocketClient.NotifyDC()
+	defer t.WebsocketClient.Conn.Close()
 
 	// get item id from websocket server
 	itemID := t.WebsocketClient.GetItemID()
@@ -50,9 +56,8 @@ func NewTrader() (t *Trader) {
 			}
 		}
 	}()
-	return t
-}
 
+}
 func (c *Trader) GetWhisper() (whisper chan string) {
 	return c.Whisper
 }

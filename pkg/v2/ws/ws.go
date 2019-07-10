@@ -4,36 +4,53 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
+	"os/signal"
+	"time"
 
 	"github.com/ando9527/poe-live-trader/conf"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 type Client struct {
-	ItemID chan []string
-	Conn   *websocket.Conn
+	ItemID    chan []string
+	Conn      *websocket.Conn
+	ServerURL string
 }
 
 func (client *Client) GetItemID() (itemID chan []string) {
 	return itemID
 }
+func (c *Client) ReConnect() {
+	header := getHeader()
+	for {
+		logrus.Infof("Connecting to %s", c.ServerURL)
+		conn, _, err := websocket.DefaultDialer.Dial(c.ServerURL, header)
+		if err == nil {
+			log.Info("Connected websocket server!")
+			c.Conn = conn
+			return
+		} else {
+			logrus.Fatal("dial:", err)
+		}
+		logrus.Info("Reconnect in 5 sec..")
+		time.Sleep(5 * time.Second)
+		logrus.Info("Reconnecting...")
+	}
+}
 
 func NewWebsocketClient() (client *Client) {
-	serverURL := getServerURL()
-	header := getHeader()
-	conn, _, e := websocket.DefaultDialer.Dial(serverURL, header)
-	if e != nil {
-		panic(e)
-	}
-	client = &Client{make(chan []string), conn}
+	url := getServerURL()
+	client = &Client{make(chan []string), nil, url}
 	return client
 }
 
 func getServerURL() (serverUrl string) {
 	urlPath := fmt.Sprintf("/api/trade/live/%s/%s", conf.Env.League, conf.Env.Filter)
 	u := url.URL{Scheme: "wss", Host: "www.pathofexile.com", Path: urlPath}
-	logrus.Infof("connecting to %s", u.String())
+
 	return u.String()
 }
 
@@ -48,4 +65,29 @@ func getHeader() (header http.Header) {
 	header.Add("Cookie", cookie)
 
 	return header
+}
+
+func (c *Client) NotifyDC() {
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt)
+
+	go func() {
+		for {
+			select {
+			case <-interrupt:
+				log.Println("interrupt, sending close signal to ws server")
+
+				err := c.Conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+				if err != nil {
+					log.Println("write close:", err)
+					return
+				}
+				select {
+				case <-time.After(time.Second):
+				}
+				return
+			}
+		}
+	}()
+
 }

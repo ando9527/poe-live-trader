@@ -2,27 +2,43 @@ package request
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"fmt"
+	"log"
+	"net/http"
+	"strings"
 
+	"github.com/ando9527/poe-live-trader/conf"
 	"github.com/ando9527/poe-live-trader/pkg/v2/types"
+	"github.com/sirupsen/logrus"
 )
 
 type Client struct {
+	GetHTTPServerURL func(itemID []string) (serverURL string)
 }
 
-func (client *Client) RequestItemDetail(strings []string) (itemDetail types.ItemDetail) {
-	body, e := ioutil.ReadFile("testing/itemDetail.json")
-	if e != nil {
-		panic(e)
+func (client *Client) RequestItemDetail(itemID []string) (itemDetail types.ItemDetail) {
+	url := client.GetHTTPServerURL(itemID)
+	resp, err := http.Get(url)
+	if err != nil {
+		logrus.Fatalf("Get item detail from url failed, url: %s", url)
 	}
+	if resp == nil || resp.Body == nil {
+		log.Fatalf("http response is nil, url: %s", url)
+	}
+	defer resp.Body.Close()
 	itemDetail = types.ItemDetail{}
-	e = json.Unmarshal(body, &itemDetail)
-	if e != nil {
-		panic(e)
+	err = json.NewDecoder(resp.Body).Decode(&itemDetail)
+
+	if err != nil {
+		logrus.Fatalf("failed to decode json of item detail, url: %s", url)
 	}
 	return itemDetail
 }
 
 func NewRequestClient() (client *Client) {
-	return &Client{}
+	client = &Client{}
+	client.GetHTTPServerURL = func(itemID []string) (serverURL string) {
+		return fmt.Sprintf("https://www.pathofexile.com/api/trade/fetch/%s?query=%s", strings.Join(itemID, ","), conf.Env.Filter)
+	}
+	return client
 }

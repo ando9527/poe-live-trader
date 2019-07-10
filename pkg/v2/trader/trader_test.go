@@ -4,17 +4,33 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ando9527/poe-live-trader/pkg/v2/request"
 	"github.com/ando9527/poe-live-trader/pkg/v2/ws"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestTrader_GetWhisper(t *testing.T) {
-	client := Trader{}
+	// ws server
 	fakeWSServer := ws.FakeWebsocketServer()
+	defer fakeWSServer.Close()
+
+	// ws client
 	fakeWSClient := ws.FakeNewWebsocketClient(fakeWSServer.URL)
+
+	// http server
+	fakeRequestServer := request.NewFakeRequestServer()
+	defer fakeRequestServer.Close()
+
+	// http client
+	fakeRequestClient := request.NewFakeRequestClient(fakeRequestServer.URL)
+
+	client := &Trader{}
+	client.RequestClient = fakeRequestClient
 	client.WebsocketClient = fakeWSClient
 
+	// start testing
+	client.Launch()
 	w := client.GetWhisper()
 	expect := "@Taranis__R_n_B___Legion Hi, I would like to buy your Exalted Orb listed for 166 chaos in Legion (stash tab \"GG\"; position: left 12, top 1)"
 	duration := time.Duration(20 * time.Millisecond)
