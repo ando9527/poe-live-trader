@@ -1,26 +1,9 @@
 package trader
 
 import (
-	"fmt"
-	"net/http"
-
-	"github.com/ando9527/poe-live-trader/conf"
-	"github.com/ando9527/poe-live-trader/pkg/v2/request"
-	"github.com/ando9527/poe-live-trader/pkg/v2/ws"
+	"github.com/ando9527/poe-live-trader/pkg/request"
+	"github.com/ando9527/poe-live-trader/pkg/ws"
 )
-
-func getHeader() (header http.Header) {
-	header = make(http.Header)
-	header.Add("Accept-Encoding", "gzip, deflate, br")
-	header.Add("Accept-Language", "en-US,en;q=0.9,zh-TW;q=0.8,zh;q=0.7,zh-CN;q=0.6,ja;q=0.5")
-	header.Add("Cache-Control", "no-cache")
-	header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36")
-
-	cookie := fmt.Sprintf("POESESSID=%s", conf.Env.Poesessid)
-	header.Add("Cookie", cookie)
-
-	return header
-}
 
 type Trader struct {
 	Whisper         chan string

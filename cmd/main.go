@@ -6,11 +6,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ando9527/poe-live-trader/pkg/audio"
-	"github.com/ando9527/poe-live-trader/pkg/v2/trader"
-	"github.com/atotto/clipboard"
-
 	"github.com/ando9527/poe-live-trader/conf"
+	"github.com/ando9527/poe-live-trader/pkg/audio"
+	"github.com/ando9527/poe-live-trader/pkg/trader"
+	"github.com/atotto/clipboard"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 )

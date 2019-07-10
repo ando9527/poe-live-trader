@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/ando9527/poe-live-trader/conf"
-	"github.com/ando9527/poe-live-trader/pkg/v2/types"
+	"github.com/ando9527/poe-live-trader/pkg/types"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -65,8 +65,8 @@ func (client *Client) ReConnect() {
 }
 
 func NewWebsocketClient() (client *Client) {
-	url := getServerURL()
-	client = &Client{make(chan []string), nil, url}
+	serverURL := getServerURL()
+	client = &Client{make(chan []string), nil, serverURL}
 	return client
 }
 

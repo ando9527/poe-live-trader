@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ando9527/poe-live-trader/pkg/v2/request"
-	"github.com/ando9527/poe-live-trader/pkg/v2/ws"
+	"github.com/ando9527/poe-live-trader/pkg/request"
+	"github.com/ando9527/poe-live-trader/pkg/ws"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )

@@ -23,7 +23,7 @@ func NewFakeRequestServer() *httptest.Server {
 	for !strings.HasSuffix(wd, "poe-live-trader") {
 		wd = filepath.Dir(wd)
 	}
-	filePath := fmt.Sprintf("%s/pkg/v2/request/testing/itemDetail.json", wd)
+	filePath := fmt.Sprintf("%s/pkg/request/testing/itemDetail.json", wd)
 	bytes, e := ioutil.ReadFile(filePath)
 	if e != nil {
 		panic(e)

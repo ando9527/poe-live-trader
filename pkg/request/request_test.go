@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ando9527/poe-live-trader/pkg/v2/types"
+	"github.com/ando9527/poe-live-trader/pkg/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,7 +18,7 @@ func expectResult() (itemDetail types.ItemDetail) {
 	for !strings.HasSuffix(wd, "poe-live-trader") {
 		wd = filepath.Dir(wd)
 	}
-	filePath := fmt.Sprintf("%s/pkg/v2/request/testing/itemDetail.json", wd)
+	filePath := fmt.Sprintf("%s/pkg/request/testing/itemDetail.json", wd)
 	body, e := ioutil.ReadFile(filePath)
 	if e != nil {
 		panic(e)

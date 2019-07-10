@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/ando9527/poe-live-trader/conf"
-	"github.com/ando9527/poe-live-trader/pkg/v2/types"
+	"github.com/ando9527/poe-live-trader/pkg/types"
 	"github.com/sirupsen/logrus"
 )
 
