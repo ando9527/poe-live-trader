@@ -20,7 +20,7 @@ all: test build
 run:
 	$(GODOTENV) $(GOCMD) run -ldflags "-X main.version=${VERSION}" cmd/main.go
 
-build: cp
+build: mkdir-build cp
 	$(GOBUILD) -o build/${PROJECT}.exe -ldflags "-X main.version=${VERSION}" cmd/main.go
 
 test:
@@ -28,6 +28,9 @@ test:
 clean:
 		rm -rf ./build
 
+mkdir-build:
+	mkdir build	
+	
 cp:
 	cp audio.wav build/
 
