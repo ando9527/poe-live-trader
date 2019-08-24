@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ando9527/poe-live-trader/conf"
+	"github.com/ando9527/poe-live-trader/cmd/conf"
 	"github.com/ando9527/poe-live-trader/pkg/types"
 	"github.com/sirupsen/logrus"
 )

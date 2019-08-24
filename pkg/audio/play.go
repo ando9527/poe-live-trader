@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/ando9527/poe-live-trader/conf"
+	"github.com/ando9527/poe-live-trader/cmd/conf"
 	"github.com/faiface/beep"
 	"github.com/faiface/beep/effects"
 	"github.com/faiface/beep/speaker"

@@ -13,6 +13,7 @@ type EnvironmentVariable struct {
 	Poesessid string  `required:"true" split_words:"true"`
 	Filter    string  `required:"true" split_words:"true"`
 	Volume    float64 `required:"true" split_words:"true"`
+	CloudEnable bool `required:"true" split_words:"true"`
 }
 
 func InitConfig() (err error) {

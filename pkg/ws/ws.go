@@ -9,7 +9,7 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/ando9527/poe-live-trader/conf"
+	"github.com/ando9527/poe-live-trader/cmd/conf"
 	"github.com/ando9527/poe-live-trader/pkg/types"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
