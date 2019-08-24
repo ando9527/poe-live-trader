@@ -86,12 +86,31 @@ func handleSSID() http.HandlerFunc{
 			logrus.Fatalf("Failed to create client: %v", err)
 		}
 		defer client.Close()
-		ssid, err := querySSID(ctx, client)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+
+		switch r.Method {
+		case http.MethodGet:
+			ssid, err := querySSID(ctx, client)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			fmt.Fprint(w, html.EscapeString(ssid))
+		case http.MethodPost:
+			if err := r.ParseForm(); err != nil {
+				http.Error(w, fmt.Sprintf("ParseForm() err: %v", err), http.StatusInternalServerError)
+				return
+			}
+			poessid := r.FormValue("poessid")
+			err = updateInsert(ctx, client, poessid)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+			fmt.Fprint(w, html.EscapeString("success"))
+			
+		default:
+			http.Error(w, "Sorry, only GET and POST methods are supported.", http.StatusInternalServerError)
 		}
-		fmt.Fprint(w, html.EscapeString(ssid))
+
 	}
 }
 
