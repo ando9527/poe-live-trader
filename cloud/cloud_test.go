@@ -1,15 +1,31 @@
 package p
 
 import (
+	"context"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
+	"cloud.google.com/go/firestore"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
+var fakeData = "123"
 
+func insertFakeData(){
+	ctx := context.Background()
+	client, err := firestore.NewClient(ctx, conf.GoogleProjectId)
+	if err != nil {
+		logrus.Fatalf("Failed to create client: %v", err)
+	}
+	defer client.Close()
+
+	err = updateInsert(ctx, client, fakeData)
+	if err != nil {
+		panic(err)
+	}
+}
 
 func TestSSID(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -22,6 +38,7 @@ func TestSSID(t *testing.T) {
 	if e != nil {
 		panic(e)
 	}
-	assert.Equal(t, "123", string(bytes))
+
+	assert.Equal(t, fakeData, string(bytes))
 
 }
