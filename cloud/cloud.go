@@ -1,4 +1,4 @@
-// Package p contains an HTTP Cloud Function.
+// Package p contains an ht Cloud Function.
 package p
 
 import (
@@ -35,46 +35,39 @@ func C(w http.ResponseWriter, r *http.Request) {
 
 func newMux() *http.ServeMux{
 	mux:=http.NewServeMux()
-	mux.Handle("/",Middleware(
-		http.HandlerFunc(ssid),
-		AuthMiddleware))
+	mux.HandleFunc("/", handleAuth(handleSSID()))
+
 	return mux
 }
 
-func Middleware(h http.Handler, middleware ...func(http.Handler) http.Handler)http.Handler{
-	for _, mw:=range middleware{
-		h = mw(h)
+
+func handleSSID() http.HandlerFunc{
+	return func(w http.ResponseWriter, r *http.Request){
+		var d struct {
+			Message string `json:"message"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&d); err != nil {
+			fmt.Fprint(w, "123")
+			return
+		}
+		if d.Message == "" {
+			fmt.Fprint(w, "123")
+			return
+		}
+		fmt.Fprint(w, html.EscapeString(d.Message))
 	}
-	return h
 }
 
-func ssid(w http.ResponseWriter, r *http.Request){
-
-
-
-	var d struct {
-		Message string `json:"message"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&d); err != nil {
-		fmt.Fprint(w, "123")
-		return
-	}
-	if d.Message == "" {
-		fmt.Fprint(w, "123")
-		return
-	}
-	fmt.Fprint(w, html.EscapeString(d.Message))
-}
-
-
-
-func AuthMiddleware(next http.Handler)http.Handler{
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+func handleAuth(h http.HandlerFunc) http.HandlerFunc{
+	return func(w http.ResponseWriter, r *http.Request){
 		user , pass, _ := r.BasicAuth()
 		if user!=conf.User || pass !=conf.Pass{
 			http.Error(w, "Not Authorized", http.StatusUnauthorized)
 			return
 		}
-		next.ServeHTTP(w,r)
-	})
+		h(w,r)
+	}
 }
+
+
+
