@@ -1,0 +1,7 @@
+version: '3'
+services:
+  exwatcher:
+    restart: always
+    image: gcr.io/eve-vpn/poe-live-trader:latest
+    env_file:
+      - dev.env

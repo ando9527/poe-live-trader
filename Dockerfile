@@ -10,6 +10,6 @@ COPY --from=alpine /etc/passwd /etc/passwd
 ADD release/ /gobin/
 
 #Cloud Run setup
-ENV PORT 8080
+#ENV PORT 8080
 
 ENTRYPOINT ["/gobin/app"]
