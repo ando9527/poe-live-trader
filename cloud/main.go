@@ -15,5 +15,5 @@ func main(){
 	if port == "" {
 		port = "8080"
 	}
-	logrus.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), s.router))
+	logrus.Panic(http.ListenAndServe(fmt.Sprintf(":%s", port), s.router))
 }

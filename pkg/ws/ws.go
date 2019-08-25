@@ -56,7 +56,7 @@ func (client *Client) ReConnect() {
 			client.ReadMessage()
 			return
 		} else {
-			logrus.Fatal("dial:", err)
+			logrus.Panic("dial:", err)
 		}
 		logrus.Info("Reconnect in 5 sec..")
 		time.Sleep(5 * time.Second)
@@ -99,7 +99,7 @@ func getPOESSID() (ssid string) {
 	c:=http.Client{Timeout:time.Second*10}
 	req, e := http.NewRequest("GET", conf.Env.CloudUrl, nil)
 	if e != nil {
-		logrus.Fatal(e)
+		logrus.Panic(e)
 	}
 	req.SetBasicAuth(conf.Env.User,conf.Env.Pass)
 	resp, err := c.Do(req)
@@ -108,7 +108,7 @@ func getPOESSID() (ssid string) {
 	}
 	all, e := ioutil.ReadAll(resp.Body)
 	if e != nil {
-		logrus.Fatal(e)
+		logrus.Panic(e)
 	}
 	logrus.Debug("using cloud poessid")
 	return string(all)

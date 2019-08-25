@@ -20,7 +20,7 @@ func insertFakeData(){
 	ctx:=context.Background()
 	c, err := cloud.NewClient(ctx)
 	if err != nil {
-		logrus.Fatal(err)
+		logrus.Panic(err)
 	}
 
 	err = c.UpdateInsert( fakeData)
@@ -74,7 +74,7 @@ func TestPOST(t *testing.T) {
 	ctx := context.Background()
 	client, err := cloud.NewClient(ctx)
 	if err != nil {
-		logrus.Fatal(err)
+		logrus.Panic(err)
 	}
 	defer client.Close()
 	ssid, err := client.QuerySSID()

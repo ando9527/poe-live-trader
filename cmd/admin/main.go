@@ -22,22 +22,22 @@ func main(){
 
 	e := godotenv.Load("admin.env")
 	if e != nil {
-		logrus.Fatal(e)
+		logrus.Panic(e)
 	}
 	conf.NewConfig()
 	ctx:=context.Background()
 
 
 	if e != nil {
-		logrus.Fatal(e)
+		logrus.Panic(e)
 	}
 	c, err := cloud.NewClient(ctx)
 	if err != nil {
-		logrus.Fatal(err)
+		logrus.Panic(err)
 	}
 	err = c.UpdateInsert(poessid)
 	if err != nil {
-		logrus.Fatal(err)
+		logrus.Panic(err)
 	}
 	fmt.Println("success!")
 

@@ -27,7 +27,7 @@ func Play() {
 
 	err = speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
 	if err != nil {
-		logrus.Fatal("sound init failed")
+		logrus.Panic("sound init failed")
 	}
 	ctrl := &beep.Ctrl{Streamer: beep.Loop(1, streamer), Paused: false}
 	volume := &effects.Volume{

@@ -13,7 +13,7 @@ func TestNewClient(t *testing.T) {
 	cb := context.Background()
 	c ,e:= NewClient(cb)
 	if e != nil {
-		logrus.Fatal(e)
+		logrus.Panic(e)
 	}
 
 	defer c.Close()

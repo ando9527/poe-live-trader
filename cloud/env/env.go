@@ -19,7 +19,7 @@ func NewConfig() (cfg Config) {
 	cfg = Config{}
 	err := envconfig.Process("app", &cfg)
 	if err != nil {
-		logrus.Fatal(errors.Wrap(err, "Please setup .env file properly"))
+		logrus.Panic(errors.Wrap(err, "Please setup .env file properly"))
 	}
 	return cfg
 }

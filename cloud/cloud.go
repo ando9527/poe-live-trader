@@ -27,7 +27,7 @@ func handleSSID() http.HandlerFunc{
 		ctx:=context.Background()
 		client, err := cloud.NewClient(ctx)
 		if err != nil {
-			logrus.Fatal(err)
+			logrus.Panic(err)
 		}
 		defer client.Close()
 

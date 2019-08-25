@@ -20,7 +20,7 @@ func (client *Client) RequestItemDetail(itemID []string) (itemDetail types.ItemD
 	url := client.GetHTTPServerURL(itemID)
 	resp, err := http.Get(url)
 	if err != nil {
-		logrus.Fatalf("Get item detail from url failed, url: %s", url)
+		logrus.Panicf("Get item detail from url failed, url: %s", url)
 	}
 	if resp == nil || resp.Body == nil {
 		log.Fatalf("http response is nil, url: %s", url)
@@ -30,7 +30,7 @@ func (client *Client) RequestItemDetail(itemID []string) (itemDetail types.ItemD
 	err = json.NewDecoder(resp.Body).Decode(&itemDetail)
 
 	if err != nil {
-		logrus.Fatalf("failed to decode json of item detail, url: %s", url)
+		logrus.Panicf("failed to decode json of item detail, url: %s", url)
 	}
 	return itemDetail
 }
