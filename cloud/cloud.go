@@ -21,15 +21,7 @@ func init(){
 	conf = env.NewConfig()
 }
 
-//func basicAuth(username, password string) string {
-//	auth := username + ":" + password
-//	return base64.StdEncoding.EncodeToString([]byte(auth))
-//}
-//
-//func redirectPolicyFunc(req *http.Request, via []*http.Request) error{
-//	req.Header.Add("Authorization","Basic " + basicAuth("admin","cycloneOP"))
-//	return nil
-//}
+
 var mux = newMux()
 
 
@@ -94,7 +86,10 @@ func handleSSID() http.HandlerFunc{
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			fmt.Fprint(w, html.EscapeString(ssid))
+			_, err = fmt.Fprint(w, html.EscapeString(ssid))
+			if err != nil {
+				logrus.Error(err)
+			}
 		case http.MethodPost:
 			if err := r.ParseForm(); err != nil {
 				http.Error(w, fmt.Sprintf("ParseForm() err: %v", err), http.StatusInternalServerError)
@@ -105,8 +100,11 @@ func handleSSID() http.HandlerFunc{
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
-			fmt.Fprint(w, html.EscapeString("success"))
-			
+			_, err := fmt.Fprint(w, html.EscapeString("success"))
+			if err != nil {
+				logrus.Error(err)
+			}
+
 		default:
 			http.Error(w, "Sorry, only GET and POST methods are supported.", http.StatusInternalServerError)
 		}
