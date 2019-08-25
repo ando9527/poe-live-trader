@@ -8,4 +8,8 @@ COPY --from=alpine /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=alpine /etc/passwd /etc/passwd
 
 ADD release/ /gobin/
+
+#Cloud Run setup
+ENV PORT 8080
+
 ENTRYPOINT ["/gobin/app"]
