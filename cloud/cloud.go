@@ -1,5 +1,5 @@
 // Package p contains an ht Cloud Function.
-package p
+package main
 
 import (
 	"context"
@@ -19,20 +19,8 @@ func init(){
 }
 
 
-var mux = newMux()
 
 
-func C(w http.ResponseWriter, r *http.Request) {
-	mux.ServeHTTP(w,r)
-}
-
-
-func newMux() *http.ServeMux{
-	mux:=http.NewServeMux()
-	mux.HandleFunc("/", handleAuth(handleSSID()))
-
-	return mux
-}
 
 func handleSSID() http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request){
@@ -88,4 +76,15 @@ func handleAuth(h http.HandlerFunc) http.HandlerFunc{
 }
 
 
+type Server struct {
+	router *http.ServeMux
+}
+
+func NewServer()(s *Server){
+	s = &Server{ http.NewServeMux()}
+	return s
+}
+func (s *Server) Routes() {
+	s.router.HandleFunc("/", handleAuth(handleSSID()))
+}
 
