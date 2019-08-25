@@ -3,17 +3,14 @@ package p
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"html"
 	"net/http"
-	"time"
 
-	"cloud.google.com/go/firestore"
 	"github.com/ando9527/poe-live-trader/cloud/env"
+	"github.com/ando9527/poe-live-trader/pkg/cloud"
 	"github.com/ando9527/poe-live-trader/pkg/log"
 	"github.com/sirupsen/logrus"
-	"google.golang.org/api/iterator"
 )
 var conf env.Config
 func init(){
@@ -37,43 +34,10 @@ func newMux() *http.ServeMux{
 	return mux
 }
 
-
-func updateInsert(ctx context.Context, client *firestore.Client, poessid string) error {
-	// [START fs_update_create_if_missing]
-	_, err := client.Collection("data").Doc("one").Set(ctx, map[string]interface{}{
-		"poessid": poessid,
-		"data":time.Now(),
-	}, firestore.MergeAll)
-
-	if err != nil {
-		logrus.Errorf("An error has occurred: %s", err)
-	}
-	return err
-}
-
-func querySSID(ctx context.Context, client *firestore.Client)(ssid string, err error) {
-	data := client.Collection("data")
-	iter := data.OrderBy("poessid", firestore.Desc).Limit(1).Documents(ctx)
-
-	for {
-		doc, err := iter.Next()
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
-			logrus.Error(err)
-		}
-		ssid = doc.Data()["poessid"].(string)
-		return ssid, nil
-	}
-	return "", errors.New("empty query")
-
-}
-
 func handleSSID() http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request){
 		ctx := context.Background()
-		client, err := firestore.NewClient(ctx, conf.GoogleProjectId)
+		client, err := cloud.NewClient(ctx)
 		if err != nil {
 			logrus.Fatalf("Failed to create client: %v", err)
 		}
@@ -81,7 +45,7 @@ func handleSSID() http.HandlerFunc{
 
 		switch r.Method {
 		case http.MethodGet:
-			ssid, err := querySSID(ctx, client)
+			ssid, err := client.QuerySSID()
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
@@ -96,7 +60,7 @@ func handleSSID() http.HandlerFunc{
 				return
 			}
 			poessid := r.FormValue("poessid")
-			err = updateInsert(ctx, client, poessid)
+			err = client.UpdateInsert(poessid)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}

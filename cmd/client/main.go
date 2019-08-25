@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"bufio"
@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ando9527/poe-live-trader/cmd/conf"
+	"github.com/ando9527/poe-live-trader/cmd/client/conf"
 	"github.com/ando9527/poe-live-trader/pkg/audio"
 	"github.com/ando9527/poe-live-trader/pkg/log"
 	"github.com/ando9527/poe-live-trader/pkg/trader"

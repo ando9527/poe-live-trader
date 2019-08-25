@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"cloud.google.com/go/firestore"
+	"github.com/ando9527/poe-live-trader/pkg/cloud"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
@@ -24,7 +25,7 @@ func insertFakeData(){
 	}
 	defer client.Close()
 
-	err = updateInsert(ctx, client, fakeData)
+	err = cloud.UpdateInsert(ctx, client, fakeData)
 	if err != nil {
 		panic(err)
 	}
@@ -74,7 +75,7 @@ func TestPOST(t *testing.T) {
 		logrus.Fatalf("Failed to create client: %v", err)
 	}
 	defer client.Close()
-	ssid, err := querySSID(ctx, client)
+	ssid, err := cloud.QuerySSID(ctx, client)
 	if err != nil {
 		panic(err)
 	}
