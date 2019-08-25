@@ -7,13 +7,13 @@ platform:
   arch: amd64
 
 steps:
-  - name: test
-    image: golang:1.11
-    cache_from: golang:1.11
-    environment:
-      GOPROXY: http://192.168.50.104:3000
-    commands:
-      - go test -v ./...
+#  - name: test
+#    image: golang:1.11
+#    cache_from: golang:1.11
+#    environment:
+#      GOPROXY: http://192.168.50.104:3000
+#    commands:
+#      - go test -v ./...
 
 
   - name: build-push
