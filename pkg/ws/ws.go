@@ -3,6 +3,7 @@ package ws
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -76,6 +77,7 @@ func getServerURL() (serverUrl string) {
 	return u.String()
 }
 
+
 func getHeader() (header http.Header) {
 	header = make(http.Header)
 	header.Add("Accept-Encoding", "gzip, deflate, br")
@@ -83,10 +85,33 @@ func getHeader() (header http.Header) {
 	header.Add("Cache-Control", "no-cache")
 	header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36")
 
-	cookie := fmt.Sprintf("POESESSID=%s", conf.Env.Poesessid)
+	cookie := fmt.Sprintf("POESESSID=%s", getPOESSID())
 	header.Add("Cookie", cookie)
 
 	return header
+}
+
+func getPOESSID() (ssid string) {
+	if conf.Env.CloudEnable==false{
+		logrus.Debug("using local poessid")
+		return conf.Env.Poesessid
+	}
+	c:=http.Client{Timeout:time.Second*10}
+	req, e := http.NewRequest("GET", conf.Env.CloudUrl, nil)
+	if e != nil {
+		logrus.Fatal(e)
+	}
+	req.SetBasicAuth(conf.Env.User,conf.Env.Pass)
+	resp, err := c.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	all, e := ioutil.ReadAll(resp.Body)
+	if e != nil {
+		logrus.Fatal(e)
+	}
+	logrus.Debug("using cloud poessid")
+	return string(all)
 }
 
 func (client *Client) NotifyDC() {

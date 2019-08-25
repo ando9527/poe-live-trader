@@ -1,8 +1,7 @@
-package client
+package main
 
 import (
 	"bufio"
-	"flag"
 	"fmt"
 	"os"
 
@@ -16,7 +15,6 @@ import (
 )
 
 var (
-	logLevel string
 	version  string
 )
 
@@ -40,9 +38,8 @@ func main() {
 		return
 	}
 
-	flag.StringVar(&logLevel, "l", "info", "Logging level")
-	flag.Parse()
-	log.InitLogger(logLevel)
+
+	log.InitLogger(conf.Env.Debug)
 	logrus.Infof("Poe Live Trader %s", version)
 
 	client := trader.NewTrader()

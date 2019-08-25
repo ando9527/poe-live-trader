@@ -8,9 +8,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func InitLogger(level string) {
+func InitLogger(debug bool) {
+	logLevel := "info"
+	if debug == true {
+		logLevel = "debug"
+	}
 	// Setup logger format
-	l, err := logrus.ParseLevel(level)
+	l, err := logrus.ParseLevel(logLevel)
 	logrus.SetFormatter(&logrus.TextFormatter{
 		ForceColors:     true,
 		FullTimestamp:   true,

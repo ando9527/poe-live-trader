@@ -18,10 +18,13 @@ SSH_PRIVATE_KEY=`cat ~/.ssh/id_rsa`
 all: test build
 
 run:
-	$(GODOTENV) $(GOCMD) run -ldflags "-X main.version=${VERSION}" cmd/main.go
+	godotenv -f .env $(GOCMD) run -ldflags "-X main.version=${VERSION}" cmd/client/main.go
+
+dev:
+	$(GODOTENV) $(GOCMD) run -ldflags "-X main.version=${VERSION}" cmd/client/main.go
 
 build: mkdir-build cp
-	$(GOBUILD) -o build/${PROJECT}.exe -ldflags "-X main.version=${VERSION}" cmd/main.go
+	$(GOBUILD) -o build/${PROJECT}.exe -ldflags "-X main.version=${VERSION}" cmd/client/main.go
 
 test:
 	$(GODOTENV) $(GOTEST) -v ./...
