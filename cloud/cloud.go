@@ -36,10 +36,10 @@ func newMux() *http.ServeMux{
 
 func handleSSID() http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request){
-		ctx := context.Background()
+		ctx:=context.Background()
 		client, err := cloud.NewClient(ctx)
 		if err != nil {
-			logrus.Fatalf("Failed to create client: %v", err)
+			logrus.Fatal(err)
 		}
 		defer client.Close()
 

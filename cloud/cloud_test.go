@@ -9,7 +9,6 @@ import (
 	"strings"
 	"testing"
 
-	"cloud.google.com/go/firestore"
 	"github.com/ando9527/poe-live-trader/pkg/cloud"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -18,14 +17,13 @@ import (
 var fakeData = "123"
 
 func insertFakeData(){
-	ctx := context.Background()
-	client, err := firestore.NewClient(ctx, conf.GoogleProjectId)
+	ctx:=context.Background()
+	c, err := cloud.NewClient(ctx)
 	if err != nil {
-		logrus.Fatalf("Failed to create client: %v", err)
+		logrus.Fatal(err)
 	}
-	defer client.Close()
 
-	err = cloud.UpdateInsert(ctx, client, fakeData)
+	err = c.UpdateInsert( fakeData)
 	if err != nil {
 		panic(err)
 	}
@@ -70,12 +68,12 @@ func TestPOST(t *testing.T) {
 
 
 	ctx := context.Background()
-	client, err := firestore.NewClient(ctx, conf.GoogleProjectId)
+	client, err := cloud.NewClient(ctx)
 	if err != nil {
-		logrus.Fatalf("Failed to create client: %v", err)
+		logrus.Fatal(err)
 	}
 	defer client.Close()
-	ssid, err := cloud.QuerySSID(ctx, client)
+	ssid, err := client.QuerySSID()
 	if err != nil {
 		panic(err)
 	}
