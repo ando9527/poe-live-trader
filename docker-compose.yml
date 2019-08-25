@@ -1,7 +1,9 @@
 version: '3'
 services:
-  exwatcher:
+  app:
     restart: always
     image: gcr.io/eve-vpn/poe-live-trader:latest
     env_file:
-      - dev.env
+      - example.cloud.env
+    ports:
+      - "9999:9999"
