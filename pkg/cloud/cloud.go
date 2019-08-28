@@ -41,6 +41,7 @@ func (s *Server) Run() {
 	if port == "" {
 		port = "8080"
 	}
+	s.Connect()
 	logrus.Panic(http.ListenAndServe(fmt.Sprintf(":%s", port), s.router))
 }
 
