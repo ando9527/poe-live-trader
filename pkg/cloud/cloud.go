@@ -2,18 +2,14 @@
 package cloud
 
 import (
-
+	"fmt"
 	"net/http"
+	"os"
 
-	"github.com/ando9527/poe-live-trader/cloud/env"
-	"github.com/ando9527/poe-live-trader/pkg/log"
 	"github.com/jinzhu/gorm"
+	"github.com/sirupsen/logrus"
 )
-var conf env.Config
-func init(){
-	log.InitCloudLogger(false)
-	conf = env.NewConfig()
-}
+
 
 
 
@@ -38,5 +34,13 @@ func NewServer()(s *Server){
 
 func (s *Server) routes() {
 	s.router.HandleFunc("/", handleAuth(s.handleSSID()))
+}
+
+func (s *Server) Run() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	logrus.Panic(http.ListenAndServe(fmt.Sprintf(":%s", port), s.router))
 }
 

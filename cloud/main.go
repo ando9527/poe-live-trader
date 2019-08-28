@@ -1,11 +1,28 @@
 package main
 
+import (
+	"os"
+	"strconv"
+
+	"github.com/ando9527/poe-live-trader/cloud/env"
+	"github.com/ando9527/poe-live-trader/pkg/cloud"
+	"github.com/ando9527/poe-live-trader/pkg/log"
+	"github.com/sirupsen/logrus"
+)
+
+var (
+	version  string
+)
+
+
 func main(){
-	//s := NewServer()
-	//s.Routes()
-	//port := os.Getenv("PORT")
-	//if port == "" {
-	//	port = "8080"
-	//}
-	//logrus.Panic(http.ListenAndServe(fmt.Sprintf(":%s", port), s.router))
+	env.Verify()
+	b, e := strconv.ParseBool(os.Getenv("APP_DEBUG"))
+	if e != nil {
+		panic(e)
+	}
+	log.InitCloudLogger(b)
+	logrus.Info("version ", version )
+	s := cloud.NewServer()
+	s.Run()
 }

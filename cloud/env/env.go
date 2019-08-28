@@ -15,11 +15,10 @@ type Config struct {
 
 
 
-func NewConfig() (cfg Config) {
-	cfg = Config{}
+func Verify()  {
+	cfg := Config{}
 	err := envconfig.Process("app", &cfg)
 	if err != nil {
 		logrus.Panic(errors.Wrap(err, "Please setup .env file properly"))
 	}
-	return cfg
 }
