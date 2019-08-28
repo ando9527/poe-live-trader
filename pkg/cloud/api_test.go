@@ -12,6 +12,7 @@ import (
 )
 
 func TestServer_handleSSID(t *testing.T) {
+	// test post
 	ssid:=SSID{
 		Content: fakeData,
 	}
@@ -35,5 +36,20 @@ func TestServer_handleSSID(t *testing.T) {
 	}
 	defer resp.Body.Close()
 	assert.Equal(t, SUCCESS, string(b2))
+
+	//test get
+
+	req = httptest.NewRequest(http.MethodGet, "/", nil)
+	recorder = httptest.NewRecorder()
+	f.ServeHTTP(recorder, req)
+	server.router.ServeHTTP(recorder, req)
+	resp=recorder.Result()
+	getSSID:=SSID{}
+	e = json.NewDecoder(resp.Body).Decode(&getSSID)
+	if e != nil {
+		panic(e)
+	}
+	defer resp.Body.Close()
+	assert.Equal(t, fakeData, getSSID.Content)
 
 }

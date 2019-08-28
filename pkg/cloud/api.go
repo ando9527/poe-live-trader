@@ -14,18 +14,19 @@ func (s *Server)handleSSID() http.HandlerFunc{
 
 		w.Header().Set("Content-Type", "application/json")
 		switch r.Method {
-		//case http.MethodGet:
-		//	ssid:=SSID{}
-		//	s.db.Where(SSID{Anchor: ANCHOR}).First(&ssid)
-		//
-		//	//if err != nil {
-		//	//	http.Error(w, err.Error(), http.StatusInternalServerError)
-		//	//	return
-		//	//}
-		//	_, err := fmt.Fprint(w, ssid)
-		//	if err != nil {
-		//		logrus.Error(err)
-		//	}
+		case http.MethodGet:
+			ssid:=SSID{}
+			e:=s.db.Where(SSID{Anchor: ANCHOR}).First(&ssid).Error
+			if e != nil {
+				logrus.Error(e)
+				http.Error(w, "error", http.StatusInternalServerError)
+				return
+			}
+
+			e = json.NewEncoder(w).Encode(&ssid)
+			if e != nil {
+				logrus.Error(e)
+			}
 		case http.MethodPost:
 			ssid:=SSID{}
 			e := json.NewDecoder(r.Body).Decode(&ssid)
