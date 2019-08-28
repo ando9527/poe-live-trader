@@ -31,13 +31,18 @@ func (s *Server)handleSSID() http.HandlerFunc{
 			e := json.NewDecoder(r.Body).Decode(&ssid)
 
 			if e!=nil {
-				http.Error(w, fmt.Sprintf("err: %v", e), http.StatusInternalServerError)
+				logrus.Error(e)
+				http.Error(w, "err", http.StatusInternalServerError)
 				return
 			}
-			//err = client.UpdateInsert(poessid)
-			//if err != nil {
-			//	http.Error(w, err.Error(), http.StatusInternalServerError)
-			//}
+			ssid.Anchor=ANCHOR
+			e = s.db.FirstOrCreate(&ssid, SSID{Anchor: ANCHOR}).Error
+			if e!=nil {
+				logrus.Error(e)
+				http.Error(w, "err", http.StatusInternalServerError)
+				return
+			}
+
 			_, err := fmt.Fprint(w, html.EscapeString(SUCCESS))
 			if err != nil {
 				logrus.Error(err)

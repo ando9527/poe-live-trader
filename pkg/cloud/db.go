@@ -24,7 +24,7 @@ func (s *Server) Connect() {
 		panic(e)
 	}
 	db.DB().SetConnMaxLifetime(time.Minute*5);
-	db.DB().SetMaxIdleConns(0);
+	db.DB().SetMaxIdleConns(5);
 	db.DB().SetMaxOpenConns(5);
 	s.db = db
 }
