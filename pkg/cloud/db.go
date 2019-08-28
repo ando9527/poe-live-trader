@@ -26,6 +26,9 @@ func (s *Server) Connect() {
 	db.DB().SetConnMaxLifetime(time.Minute*5);
 	db.DB().SetMaxIdleConns(5);
 	db.DB().SetMaxOpenConns(5);
+	if os.Getenv("APP_DEBUG")=="true"{
+		db.LogMode(true)
+	}
 	s.db = db
 }
 
@@ -37,4 +40,7 @@ func (s *Server) DropTable() {
 	s.db.DropTableIfExists(&SSID{})
 }
 
+func (s *Server) Migration() {
+	s.db.AutoMigrate(&SSID{})
+}
 
