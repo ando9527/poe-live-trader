@@ -25,7 +25,9 @@ func (s *Server)handleSSID() http.HandlerFunc{
 
 			e = json.NewEncoder(w).Encode(&ssid)
 			if e != nil {
+				http.Error(w, "error", http.StatusInternalServerError)
 				logrus.Error(e)
+				return
 			}
 		case http.MethodPost:
 			ssid:=SSID{}
@@ -45,8 +47,11 @@ func (s *Server)handleSSID() http.HandlerFunc{
 			}
 
 			_, err := fmt.Fprint(w, html.EscapeString(SUCCESS))
+			return
 			if err != nil {
+				http.Error(w, "error", http.StatusInternalServerError)
 				logrus.Error(err)
+				return
 			}
 
 		default:

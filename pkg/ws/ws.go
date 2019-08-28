@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/ando9527/poe-live-trader/cmd/client/conf"
+	"github.com/ando9527/poe-live-trader/pkg/cloud"
 	"github.com/ando9527/poe-live-trader/pkg/types"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
@@ -106,12 +107,17 @@ func getPOESSID() (ssid string) {
 	if err != nil {
 		panic(err)
 	}
-	all, e := ioutil.ReadAll(resp.Body)
-	if e != nil {
-		logrus.Panic(e)
+	s:=cloud.SSID{}
+	bytes, _ := ioutil.ReadAll(resp.Body)
+	logrus.Error(string(bytes))
+
+	er := json.NewDecoder(resp.Body).Decode(&s)
+	defer resp.Body.Close()
+	if er != nil {
+		logrus.Panic(er)
 	}
 	logrus.Debug("using cloud poessid")
-	return string(all)
+	return s.Content
 }
 
 func (client *Client) NotifyDC() {
