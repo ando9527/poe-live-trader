@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/ando9527/poe-live-trader/cmd/client/conf"
@@ -23,6 +24,7 @@ func PostSSID(url string, poessid string){
 	if e != nil {
 		panic(e)
 	}
+	request.SetBasicAuth(os.Getenv("APP_USER"), os.Getenv("APP_PASS"))
 	request.Header.Set("Content-Type", "application/json")
 	c:=http.Client{}
 	resp, e := c.Do(request)

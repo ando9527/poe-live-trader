@@ -11,6 +11,8 @@ type Config struct {
 	GoogleProjectId string `required:"true" split_words:"true"`
 	Dsn string `required:"true" split_words:"true"`
 	CloudUrl string `required:"true" split_words:"true"`
+	User string `required:"true" split_words:"true"`
+	Pass string `required:"true" split_words:"true"`
 
 
 }
