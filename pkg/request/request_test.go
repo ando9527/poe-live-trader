@@ -40,3 +40,8 @@ func TestClient_RequestItemDetail(t *testing.T) {
 	assert.Equal(t, expect, actual)
 
 }
+
+func TestGetPOESSID(t *testing.T) {
+
+}
+

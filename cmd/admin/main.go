@@ -1,11 +1,8 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"flag"
 	"fmt"
-	"net/http"
 	"os"
 
 	"github.com/ando9527/poe-live-trader/pkg/cloud"
@@ -26,24 +23,9 @@ func main(){
 	}
 	flag.Parse()
 	if poessid!=""{
-		s:=cloud.SSID{}
-		s.Content = poessid
-		ytes, e := json.Marshal(&s)
-		if e != nil {
-			panic(e)
-		}
-		request, e := http.NewRequest("POST", os.Getenv("APP_CLOUD_URL"), bytes.NewReader(ytes))
-		if e != nil {
-			panic(e)
-		}
-		c:=http.Client{}
-		resp, e := c.Do(request)
-		if e != nil {
-			panic(e)
-		}
-		if resp.StatusCode ==200{
-			fmt.Println("success")
-		} 
+		fmt.Println("poessid", poessid)
+		fmt.Println(os.Getenv("APP_CLOUD_URL"))
+		cloud.PostSSID(os.Getenv("APP_CLOUD_URL"), poessid)
 	}
 
 	if migration==true{
