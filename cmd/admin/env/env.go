@@ -1,4 +1,4 @@
-package conf
+package env
 
 import (
 	"github.com/kelseyhightower/envconfig"
@@ -6,7 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type Config struct {
+type Env struct {
 	LogLevel        string     `required:"true" split_words:"true"`
 	GoogleProjectId string `required:"true" split_words:"true"`
 	Dsn string `required:"true" split_words:"true"`
@@ -29,9 +29,9 @@ func InitAuth(){
 
 
 
-func NewConfig() (cfg Config) {
+func NewEnv() (cfg Env) {
 	InitAuth()
-	cfg = Config{}
+	cfg = Env{}
 	err := envconfig.Process("admin", &cfg)
 	if err != nil {
 		logrus.Panic(errors.Wrap(err, "Please setup .env file properly"))

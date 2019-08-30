@@ -1,4 +1,4 @@
-package conf
+package env
 
 import (
 	"github.com/kelseyhightower/envconfig"
@@ -8,7 +8,7 @@ import (
 
 
 
-type Config struct {
+type Env struct {
 	LogLevel      string  `required:"true" split_words:"true"`
 	League      string  `required:"true" split_words:"true"`
 	Poesessid   string  `required:"true" split_words:"true"`
@@ -21,8 +21,8 @@ type Config struct {
 
 }
 
-func NewConfig()(cfg Config)  {
-	cfg = Config{}
+func NewEnv()(cfg Env)  {
+	cfg = Env{}
 	err := envconfig.Process("cloud", &cfg)
 	if err != nil {
 		logrus.Panic(errors.Wrap(err, "Please setup .env file properly"))

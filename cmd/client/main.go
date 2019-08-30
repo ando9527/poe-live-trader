@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ando9527/poe-live-trader/cmd/client/conf"
+	"github.com/ando9527/poe-live-trader/cmd/client/env"
 	"github.com/ando9527/poe-live-trader/pkg/audio"
 	"github.com/ando9527/poe-live-trader/pkg/log"
 	"github.com/ando9527/poe-live-trader/pkg/trader"
@@ -31,7 +31,7 @@ func main() {
 		pause()
 		return
 	}
-	cfg:=conf.NewConfig()
+	cfg:= env.NewEnv()
 
 
 	log.InitLogger(cfg.LogLevel)
