@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ando9527/poe-live-trader/cmd/client/conf"
 	"github.com/sirupsen/logrus"
 )
 
@@ -36,14 +35,14 @@ func PostSSID(url string, poessid string, user string, pass string) {
 	}
 }
 
-func GetPOESSID(url string) (ssid string) {
+func GetPOESSID(serverURL string, user string, pass string) (ssid string) {
 
 	c := http.Client{Timeout: time.Second * 10}
-	req, e := http.NewRequest("GET", url, nil)
+	req, e := http.NewRequest("GET", serverURL, nil)
 	if e != nil {
 		logrus.Panic(e)
 	}
-	req.SetBasicAuth(conf.Env.User, conf.Env.Pass)
+	req.SetBasicAuth(user, pass)
 	resp, err := c.Do(req)
 	if err != nil {
 		panic(err)

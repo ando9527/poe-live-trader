@@ -5,7 +5,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/ando9527/poe-live-trader/cmd/client/conf"
 	"github.com/faiface/beep"
 	"github.com/faiface/beep/effects"
 	"github.com/faiface/beep/speaker"
@@ -13,7 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Play() {
+func Play(volume float64) {
 	f, err := os.Open("audio.wav")
 	if err != nil {
 		log.Fatal(err)
@@ -30,13 +29,13 @@ func Play() {
 		logrus.Panic("sound init failed")
 	}
 	ctrl := &beep.Ctrl{Streamer: beep.Loop(1, streamer), Paused: false}
-	volume := &effects.Volume{
+	v := &effects.Volume{
 		Streamer: ctrl,
 		Base:     2,
-		Volume:   conf.Env.Volume,
+		Volume:   volume,
 		Silent:   false,
 	}
-	speedy := beep.ResampleRatio(4, 1, volume)
+	speedy := beep.ResampleRatio(4, 1, v)
 	//speaker.Play(speedy)
 	done := make(chan bool)
 	speaker.Play(beep.Seq(speedy, beep.Callback(func() {

@@ -2,11 +2,11 @@ package conf
 
 import (
 	"github.com/kelseyhightower/envconfig"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
-var (
-	Env Config
-)
+
 
 type Config struct {
 	LogLevel      string  `required:"true" split_words:"true"`
@@ -21,10 +21,11 @@ type Config struct {
 
 }
 
-func InitConfig() (err error) {
-	err = envconfig.Process("client", &Env)
+func NewConfig()(cfg Config)  {
+	cfg = Config{}
+	err := envconfig.Process("cloud", &cfg)
 	if err != nil {
-		return err
+		logrus.Panic(errors.Wrap(err, "Please setup .env file properly"))
 	}
-	return nil
+	return cfg
 }

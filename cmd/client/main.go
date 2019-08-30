@@ -9,6 +9,7 @@ import (
 	"github.com/ando9527/poe-live-trader/pkg/audio"
 	"github.com/ando9527/poe-live-trader/pkg/log"
 	"github.com/ando9527/poe-live-trader/pkg/trader"
+	"github.com/ando9527/poe-live-trader/pkg/ws"
 	"github.com/atotto/clipboard"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
@@ -30,26 +31,28 @@ func main() {
 		pause()
 		return
 	}
-	err = conf.InitConfig()
-	if err != nil {
-		logrus.Error(err)
-		logrus.Error("Please setup .env file properly")
-		pause()
-		return
-	}
+	cfg:=conf.NewConfig()
 
 
-	log.InitLogger(conf.Env.LogLevel)
+	log.InitLogger(cfg.LogLevel)
 	logrus.Infof("Poe Live Trader %s", version)
 
-	client := trader.NewTrader()
+	config:=		ws.Config{
+		CloudEnable: cfg.CloudEnable,
+		CloudURL:    cfg.CloudUrl,
+		User:        cfg.User,
+		Pass:        cfg.Pass,
+		League:      cfg.League,
+		Filter:      cfg.Filter,
+	}
+	client := trader.NewTrader(config)
 	client.Launch()
 	whisper := client.Whisper
 	for {
 		select {
 		case result := <-whisper:
 			fmt.Println(result)
-			audio.Play()
+			audio.Play(cfg.Volume)
 			err := clipboard.WriteAll(result)
 			if err != nil {
 				logrus.Warn("failed copy whisper to clipboard.")

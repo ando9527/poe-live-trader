@@ -11,11 +11,11 @@ type Trader struct {
 	RequestClient   *request.Client
 }
 
-func NewTrader() (t *Trader) {
+func NewTrader(wsConfig ws.Config) (t *Trader) {
 	t = &Trader{}
 	t.Whisper = make(chan string)
-	t.WebsocketClient = ws.NewWebsocketClient()
-	t.RequestClient = request.NewRequestClient()
+	t.WebsocketClient = ws.NewClient(wsConfig)
+	t.RequestClient = request.NewRequestClient(wsConfig.Filter)
 	return t
 }
 func (t *Trader) Launch() {

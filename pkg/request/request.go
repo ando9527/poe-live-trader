@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ando9527/poe-live-trader/cmd/client/conf"
 	"github.com/ando9527/poe-live-trader/pkg/types"
 	"github.com/sirupsen/logrus"
 )
@@ -35,10 +34,10 @@ func (client *Client) RequestItemDetail(itemID []string) (itemDetail types.ItemD
 	return itemDetail
 }
 
-func NewRequestClient() (client *Client) {
+func NewRequestClient(filter string) (client *Client) {
 	client = &Client{}
 	client.GetHTTPServerURL = func(itemID []string) (serverURL string) {
-		return fmt.Sprintf("https://www.pathofexile.com/api/trade/fetch/%s?query=%s", strings.Join(itemID, ","), conf.Env.Filter)
+		return fmt.Sprintf("https://www.pathofexile.com/api/trade/fetch/%s?query=%s", strings.Join(itemID, ","), filter)
 	}
 	return client
 }

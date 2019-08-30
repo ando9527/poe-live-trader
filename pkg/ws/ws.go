@@ -9,7 +9,6 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/ando9527/poe-live-trader/cmd/client/conf"
 	"github.com/ando9527/poe-live-trader/pkg/cloud"
 	"github.com/ando9527/poe-live-trader/pkg/types"
 	"github.com/gorilla/websocket"
@@ -18,12 +17,36 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+
+type Config struct{
+	CloudEnable bool
+	envPOESSID string
+	CloudURL string
+	User string
+	Pass string
+	League string
+	Filter string
+}
+
+
 type Client struct {
 	ItemID    chan []string
 	Conn      *websocket.Conn
+	Config Config
 	ServerURL string
+
+
 }
 
+func NewClient(cfg Config) *Client {
+	serverURL := getServerURL(cfg.League, cfg.Filter)
+	return &Client{
+		ItemID:    make(chan []string),
+		Conn:      nil,
+		Config:    cfg,
+		ServerURL: serverURL,
+	}
+}
 func (client *Client) ReadMessage() {
 	go func() {
 		itemID := types.ItemID{}
@@ -46,7 +69,7 @@ func (client *Client) ReadMessage() {
 }
 
 func (client *Client) ReConnect() {
-	header := getHeader()
+	header := client.getHeader()
 	for {
 		logrus.Infof("Connecting to %s", client.ServerURL)
 		conn, _, err := websocket.DefaultDialer.Dial(client.ServerURL, header)
@@ -65,32 +88,27 @@ func (client *Client) ReConnect() {
 
 }
 
-func NewWebsocketClient() (client *Client) {
-	serverURL := getServerURL()
-	client = &Client{make(chan []string), nil, serverURL}
-	return client
-}
 
-func getServerURL() (serverUrl string) {
-	urlPath := fmt.Sprintf("/api/trade/live/%s/%s", conf.Env.League, conf.Env.Filter)
+func getServerURL(league string, filter string) (serverUrl string) {
+	urlPath := fmt.Sprintf("/api/trade/live/%s/%s", league, filter)
 	u := url.URL{Scheme: "wss", Host: "www.pathofexile.com", Path: urlPath}
 	return u.String()
 }
 
 
-func getHeader() (header http.Header) {
+func (c *Client)getHeader() (header http.Header) {
 	header = make(http.Header)
 	header.Add("Accept-Encoding", "gzip, deflate, br")
 	header.Add("Accept-Language", "en-US,en;q=0.9,zh-TW;q=0.8,zh;q=0.7,zh-CN;q=0.6,ja;q=0.5")
 	header.Add("Cache-Control", "no-cache")
 	header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36")
 
-	if conf.Env.CloudEnable == false {
+	if c.Config.CloudEnable == false {
 		logrus.Debug("using local poessid")
-		cookie := fmt.Sprintf("POESESSID=%s", conf.Env.Poesessid)
+		cookie := fmt.Sprintf("POESESSID=%s", c.Config.envPOESSID)
 		header.Add("Cookie", cookie)
 	}else{
-		ssid:=cloud.GetPOESSID(os.Getenv("APP_CLOUD_URL"))
+		ssid:=cloud.GetPOESSID(c.ServerURL,c.Config.User,c.Config.Pass)
 		cookie := fmt.Sprintf("POESESSID=%s", ssid)
 		header.Add("Cookie", cookie)
 	}
