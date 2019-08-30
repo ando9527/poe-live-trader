@@ -32,7 +32,7 @@ func main(){
 	}
 
 	if migration==true{
-		s := cloud.NewServer(env.Dsn, env.User, env.Pass)
+		s := cloud.NewServer(env.Dsn, env.User, env.Pass, env.LogLevel)
 		s.Connect()
 		s.Migration()
 	}

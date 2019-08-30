@@ -1,7 +1,6 @@
 package cloud
 
 import (
-	"os"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -19,14 +18,14 @@ type SSID struct {
 
 
 func (s *Server) Connect() {
-	db, e := gorm.Open("mysql", os.Getenv("APP_DSN"))
+	db, e := gorm.Open("mysql", s.dsn)
 	if e != nil {
 		panic(e)
 	}
 	db.DB().SetConnMaxLifetime(time.Minute*5)
 	db.DB().SetMaxIdleConns(5)
 	db.DB().SetMaxOpenConns(5)
-	if os.Getenv("APP_DEBUG")=="true"{
+	if s.logLevel=="debug"{
 		db.LogMode(true)
 	}
 	s.db = db

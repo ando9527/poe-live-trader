@@ -2,13 +2,12 @@ package cloud
 
 import (
 	"net/http"
-	"os"
 )
 
-func handleAuth(h http.HandlerFunc) http.HandlerFunc{
+func (s *Server)handleAuth(h http.HandlerFunc) http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request){
 		user , pass, _ := r.BasicAuth()
-		if user!=os.Getenv("APP_USER") || pass != os.Getenv("APP_PASS"){
+		if user!=s.user || pass != s.pass{
 			http.Error(w, "Not Authorized", http.StatusUnauthorized)
 			return
 		}

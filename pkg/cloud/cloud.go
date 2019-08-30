@@ -24,15 +24,17 @@ type Server struct {
 	dsn string
 	user string
 	pass string
+	logLevel string
 }
 
-func NewServer(dsn string, user string, pass string) (s *Server) {
+func NewServer(dsn string, user string, pass string, logLevel string) (s *Server) {
 	s = &Server{
 		router: http.NewServeMux(),
 		db:     nil,
 		dsn:    dsn,
 		user:   user,
 		pass:   pass,
+		logLevel: logLevel,
 	}
 	s.routes()
 
@@ -40,7 +42,7 @@ func NewServer(dsn string, user string, pass string) (s *Server) {
 }
 
 func (s *Server) routes() {
-	s.router.HandleFunc("/", handleAuth(s.handleSSID()))
+	s.router.HandleFunc("/", s.handleAuth(s.handleSSID()))
 }
 
 func (s *Server) Run() {
