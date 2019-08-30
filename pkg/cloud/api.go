@@ -47,7 +47,6 @@ func (s *Server)handleSSID() http.HandlerFunc{
 			}
 
 			_, err := fmt.Fprint(w, html.EscapeString(SUCCESS))
-			return
 			if err != nil {
 				http.Error(w, "error", http.StatusInternalServerError)
 				logrus.Error(err)

@@ -7,7 +7,7 @@ import (
 )
 
 type Config struct {
-	Debug        bool     `required:"true" split_words:"true"`
+	LogLevel        string     `required:"true" split_words:"true"`
 	GoogleProjectId string `required:"true" split_words:"true"`
 	Dsn string `required:"true" split_words:"true"`
 	CloudUrl string `required:"true" split_words:"true"`

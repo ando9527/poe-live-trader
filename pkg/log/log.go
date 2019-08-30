@@ -8,13 +8,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func InitLogger(debug bool) {
-	logLevel := "info"
-	if debug == true {
-		logLevel = "debug"
-	}
+func InitLogger(level string) {
 	// Setup logger format
-	l, err := logrus.ParseLevel(logLevel)
+	l, err := logrus.ParseLevel(level)
 	logrus.SetFormatter(&logrus.TextFormatter{
 		ForceColors:     true,
 		FullTimestamp:   true,
@@ -27,13 +23,9 @@ func InitLogger(debug bool) {
 	logrus.SetLevel(l)
 }
 
-func InitCloudLogger(debug bool) {
-	logLevel := "info"
-	if debug == true {
-		logLevel = "debug"
-	}
+func InitCloudLogger(level string) {
 	// Setup logger format
-	l, err := logrus.ParseLevel(logLevel)
+	l, err := logrus.ParseLevel(level)
 	logrus.SetFormatter(log.NewFormatter())
 	if err != nil {
 		logrus.Panic(err.Error())

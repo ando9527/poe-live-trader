@@ -1,4 +1,4 @@
-package env
+package conf
 
 import (
 "github.com/kelseyhightower/envconfig"
@@ -7,7 +7,7 @@ import (
 )
 
 type Config struct {
-	Debug        bool     `required:"true" split_words:"true"`
+	LogLevel        string     `required:"true" split_words:"true"`
 	User string   `required:"true" split_words:"true"`
 	Pass string   `required:"true" split_words:"true"`
 	GoogleProjectId string `required:"true" split_words:"true"`
@@ -17,10 +17,11 @@ type Config struct {
 
 
 
-func Verify()  {
-	cfg := Config{}
+func NewConfig()(cfg Config)  {
+	cfg = Config{}
 	err := envconfig.Process("app", &cfg)
 	if err != nil {
 		logrus.Panic(errors.Wrap(err, "Please setup .env file properly"))
 	}
+	return cfg
 }

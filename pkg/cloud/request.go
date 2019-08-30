@@ -20,6 +20,7 @@ func PostSSID(url string, poessid string){
 	if e != nil {
 		panic(e)
 	}
+
 	request, e := http.NewRequest("POST", url, bytes.NewReader(ytes))
 	if e != nil {
 		panic(e)

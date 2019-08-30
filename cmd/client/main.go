@@ -39,7 +39,7 @@ func main() {
 	}
 
 
-	log.InitLogger(conf.Env.Debug)
+	log.InitLogger(conf.Env.LogLevel)
 	logrus.Infof("Poe Live Trader %s", version)
 
 	client := trader.NewTrader()

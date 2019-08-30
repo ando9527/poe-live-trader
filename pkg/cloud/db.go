@@ -23,9 +23,9 @@ func (s *Server) Connect() {
 	if e != nil {
 		panic(e)
 	}
-	db.DB().SetConnMaxLifetime(time.Minute*5);
-	db.DB().SetMaxIdleConns(5);
-	db.DB().SetMaxOpenConns(5);
+	db.DB().SetConnMaxLifetime(time.Minute*5)
+	db.DB().SetMaxIdleConns(5)
+	db.DB().SetMaxOpenConns(5)
 	if os.Getenv("APP_DEBUG")=="true"{
 		db.LogMode(true)
 	}

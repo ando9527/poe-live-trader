@@ -5,13 +5,9 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
-func init() {
-	log.SetLevel(log.DebugLevel)
-}
 
 func TestClient_GetItemID(t *testing.T) {
 	server := FakeWebsocketServer()

@@ -5,11 +5,11 @@ import (
 )
 
 var (
-	Env EnvironmentVariable
+	Env Config
 )
 
-type EnvironmentVariable struct {
-	Debug      bool  `required:"true" split_words:"true"`
+type Config struct {
+	LogLevel      string  `required:"true" split_words:"true"`
 	League      string  `required:"true" split_words:"true"`
 	Poesessid   string  `required:"true" split_words:"true"`
 	Filter      string  `required:"true" split_words:"true"`

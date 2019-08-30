@@ -3,9 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
 
+	"github.com/ando9527/poe-live-trader/cmd/admin/conf"
 	"github.com/ando9527/poe-live-trader/pkg/cloud"
+	"github.com/ando9527/poe-live-trader/pkg/log"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 )
@@ -21,11 +22,13 @@ func main(){
 	if e != nil {
 		logrus.Panic(e)
 	}
+	cfg := conf.NewConfig()
+	log.InitLogger(cfg.LogLevel)
 	flag.Parse()
 	if poessid!=""{
 		fmt.Println("poessid", poessid)
-		fmt.Println(os.Getenv("APP_CLOUD_URL"))
-		cloud.PostSSID(os.Getenv("APP_CLOUD_URL"), poessid)
+		fmt.Println(cfg.CloudUrl)
+		cloud.PostSSID(cfg.CloudUrl, poessid)
 	}
 
 	if migration==true{
