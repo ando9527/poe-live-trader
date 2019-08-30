@@ -21,14 +21,21 @@ import (
 type Server struct {
 	router *http.ServeMux
 	db *gorm.DB
+	dsn string
+	user string
+	pass string
 }
 
-func NewServer()(s *Server){
+func NewServer(dsn string, user string, pass string) (s *Server) {
 	s = &Server{
 		router: http.NewServeMux(),
 		db:     nil,
+		dsn:    dsn,
+		user:   user,
+		pass:   pass,
 	}
 	s.routes()
+
 	return s
 }
 

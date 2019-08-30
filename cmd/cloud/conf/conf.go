@@ -19,7 +19,7 @@ type Config struct {
 
 func NewConfig()(cfg Config)  {
 	cfg = Config{}
-	err := envconfig.Process("app", &cfg)
+	err := envconfig.Process("cloud", &cfg)
 	if err != nil {
 		logrus.Panic(errors.Wrap(err, "Please setup .env file properly"))
 	}

@@ -9,7 +9,7 @@ import (
 
 func TestPostSSID(t *testing.T) {
 	server := httptest.NewServer(server.handleSSID())
-	PostSSID(server.URL, fakeData)
+	PostSSID(server.URL, fakeData, "", "")
 	ssid := GetPOESSID(server.URL)
 	assert.Equal(t, fakeData, ssid)
 

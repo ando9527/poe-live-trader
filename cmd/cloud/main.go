@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/ando9527/poe-live-trader/cloud/conf"
+	"github.com/ando9527/poe-live-trader/cmd/cloud/conf"
 	"github.com/ando9527/poe-live-trader/pkg/cloud"
 	"github.com/ando9527/poe-live-trader/pkg/log"
 	"github.com/sirupsen/logrus"
@@ -16,6 +16,6 @@ func main(){
 	cfg := conf.NewConfig()
 	log.InitCloudLogger(cfg.LogLevel)
 	logrus.Info("version ", version )
-	s := cloud.NewServer()
+	s := cloud.NewServer(cfg.Dsn, cfg.User, cfg.Pass)
 	s.Run()
 }

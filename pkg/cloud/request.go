@@ -5,14 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/ando9527/poe-live-trader/cmd/client/conf"
 	"github.com/sirupsen/logrus"
 )
 
-func PostSSID(url string, poessid string){
+func PostSSID(url string, poessid string, user string, pass string) {
 	logrus.Debug("post ", poessid, " to ", url)
 	s:=SSID{}
 	s.Content = poessid
@@ -25,7 +24,7 @@ func PostSSID(url string, poessid string){
 	if e != nil {
 		panic(e)
 	}
-	request.SetBasicAuth(os.Getenv("APP_USER"), os.Getenv("APP_PASS"))
+	request.SetBasicAuth(user, pass)
 	request.Header.Set("Content-Type", "application/json")
 	c:=http.Client{}
 	resp, e := c.Do(request)

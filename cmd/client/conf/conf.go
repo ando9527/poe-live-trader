@@ -22,7 +22,7 @@ type Config struct {
 }
 
 func InitConfig() (err error) {
-	err = envconfig.Process("app", &Env)
+	err = envconfig.Process("client", &Env)
 	if err != nil {
 		return err
 	}

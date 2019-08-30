@@ -28,11 +28,11 @@ func main(){
 	if poessid!=""{
 		fmt.Println("poessid", poessid)
 		fmt.Println(cfg.CloudUrl)
-		cloud.PostSSID(cfg.CloudUrl, poessid)
+		cloud.PostSSID(cfg.CloudUrl, poessid, cfg.User, cfg.User)
 	}
 
 	if migration==true{
-		s := cloud.NewServer()
+		s := cloud.NewServer(cfg.Dsn, cfg.User,cfg.Pass)
 		s.Connect()
 		s.Migration()
 	}

@@ -13,8 +13,6 @@ type Config struct {
 	CloudUrl string `required:"true" split_words:"true"`
 	User string `required:"true" split_words:"true"`
 	Pass string `required:"true" split_words:"true"`
-
-
 }
 
 type Auth struct{
@@ -34,7 +32,7 @@ func InitAuth(){
 func NewConfig() (cfg Config) {
 	InitAuth()
 	cfg = Config{}
-	err := envconfig.Process("app", &cfg)
+	err := envconfig.Process("admin", &cfg)
 	if err != nil {
 		logrus.Panic(errors.Wrap(err, "Please setup .env file properly"))
 	}
