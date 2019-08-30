@@ -25,9 +25,9 @@ func pause() {
 }
 
 func main() {
-	err := godotenv.Load()
+	err := godotenv.Load("client.env")
 	if err != nil {
-		logrus.Error("Error loading .env file")
+		logrus.Error("Error loading client.env file")
 		pause()
 		return
 	}

@@ -35,10 +35,10 @@ func PostSSID(url string, poessid string, user string, pass string) {
 	}
 }
 
-func GetPOESSID(serverURL string, user string, pass string) (ssid string) {
+func GetPOESSID(cloudURL string, user string, pass string) (ssid string) {
 
 	c := http.Client{Timeout: time.Second * 10}
-	req, e := http.NewRequest("GET", serverURL, nil)
+	req, e := http.NewRequest("GET", cloudURL, nil)
 	if e != nil {
 		logrus.Panic(e)
 	}

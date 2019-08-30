@@ -108,7 +108,7 @@ func (c *Client)getHeader() (header http.Header) {
 		cookie := fmt.Sprintf("POESESSID=%s", c.Config.envPOESSID)
 		header.Add("Cookie", cookie)
 	}else{
-		ssid:=cloud.GetPOESSID(c.ServerURL,c.Config.User,c.Config.Pass)
+		ssid:=cloud.GetPOESSID(c.Config.CloudURL,c.Config.User,c.Config.Pass)
 		cookie := fmt.Sprintf("POESESSID=%s", ssid)
 		header.Add("Cookie", cookie)
 	}

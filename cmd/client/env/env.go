@@ -23,7 +23,7 @@ type Env struct {
 
 func NewEnv()(cfg Env)  {
 	cfg = Env{}
-	err := envconfig.Process("cloud", &cfg)
+	err := envconfig.Process("client", &cfg)
 	if err != nil {
 		logrus.Panic(errors.Wrap(err, "Please setup .env file properly"))
 	}
