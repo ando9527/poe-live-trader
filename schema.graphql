@@ -1,0 +1,22 @@
+# This file was generated based on ".graphqlconfig". Do not edit manually.
+
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+type Mutation {
+    createSSID(input: NewSSID!): SSID!
+}
+
+type Query {
+    ssid: SSID!
+}
+
+type SSID{
+    text: String!
+}
+
+input NewSSID{
+    text: String!
+}
