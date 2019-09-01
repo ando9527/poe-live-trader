@@ -43,7 +43,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		CreateSsid func(childComplexity int, input NewSsid) int
+		CreateOrUpdateSsid func(childComplexity int, input NewSsid) int
 	}
 
 	Query struct {
@@ -51,12 +51,14 @@ type ComplexityRoot struct {
 	}
 
 	Ssid struct {
-		Text func(childComplexity int) int
+		Anchor  func(childComplexity int) int
+		Content func(childComplexity int) int
+		ID      func(childComplexity int) int
 	}
 }
 
 type MutationResolver interface {
-	CreateSsid(ctx context.Context, input NewSsid) (*Ssid, error)
+	CreateOrUpdateSsid(ctx context.Context, input NewSsid) (*Ssid, error)
 }
 type QueryResolver interface {
 	Ssid(ctx context.Context) (*Ssid, error)
@@ -77,17 +79,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Mutation.createSSID":
-		if e.complexity.Mutation.CreateSsid == nil {
+	case "Mutation.createOrUpdateSSID":
+		if e.complexity.Mutation.CreateOrUpdateSsid == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_createSSID_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_createOrUpdateSSID_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateSsid(childComplexity, args["input"].(NewSsid)), true
+		return e.complexity.Mutation.CreateOrUpdateSsid(childComplexity, args["input"].(NewSsid)), true
 
 	case "Query.ssid":
 		if e.complexity.Query.Ssid == nil {
@@ -96,12 +98,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Ssid(childComplexity), true
 
-	case "SSID.text":
-		if e.complexity.Ssid.Text == nil {
+	case "SSID.Anchor":
+		if e.complexity.Ssid.Anchor == nil {
 			break
 		}
 
-		return e.complexity.Ssid.Text(childComplexity), true
+		return e.complexity.Ssid.Anchor(childComplexity), true
+
+	case "SSID.Content":
+		if e.complexity.Ssid.Content == nil {
+			break
+		}
+
+		return e.complexity.Ssid.Content(childComplexity), true
+
+	case "SSID.ID":
+		if e.complexity.Ssid.ID == nil {
+			break
+		}
+
+		return e.complexity.Ssid.ID(childComplexity), true
 
 	}
 	return 0, false
@@ -173,7 +189,7 @@ schema {
 }
 
 type Mutation {
-    createSSID(input: NewSSID!): SSID!
+    createOrUpdateSSID(input: NewSSID!): SSID!
 }
 
 type Query {
@@ -181,19 +197,23 @@ type Query {
 }
 
 type SSID{
-    text: String!
+    ID: Int!
+    Content: String!
+    Anchor: String!
 }
 
 input NewSSID{
-    text: String!
-}`},
+    Content: String!
+}
+
+`},
 )
 
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_createSSID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_createOrUpdateSSID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 NewSsid
@@ -257,7 +277,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Mutation_createSSID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_createOrUpdateSSID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -274,7 +294,7 @@ func (ec *executionContext) _Mutation_createSSID(ctx context.Context, field grap
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_createSSID_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_createOrUpdateSSID_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -283,7 +303,7 @@ func (ec *executionContext) _Mutation_createSSID(ctx context.Context, field grap
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateSsid(rctx, args["input"].(NewSsid))
+		return ec.resolvers.Mutation().CreateOrUpdateSsid(rctx, args["input"].(NewSsid))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -413,7 +433,7 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _SSID_text(ctx context.Context, field graphql.CollectedField, obj *Ssid) (ret graphql.Marshaler) {
+func (ec *executionContext) _SSID_ID(ctx context.Context, field graphql.CollectedField, obj *Ssid) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -432,7 +452,81 @@ func (ec *executionContext) _SSID_text(ctx context.Context, field graphql.Collec
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Text, nil
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SSID_Content(ctx context.Context, field graphql.CollectedField, obj *Ssid) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "SSID",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Content, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SSID_Anchor(ctx context.Context, field graphql.CollectedField, obj *Ssid) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "SSID",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Anchor, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1607,9 +1701,9 @@ func (ec *executionContext) unmarshalInputNewSSID(ctx context.Context, obj inter
 
 	for k, v := range asMap {
 		switch k {
-		case "text":
+		case "Content":
 			var err error
-			it.Text, err = ec.unmarshalNString2string(ctx, v)
+			it.Content, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -1642,8 +1736,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "createSSID":
-			out.Values[i] = ec._Mutation_createSSID(ctx, field)
+		case "createOrUpdateSSID":
+			out.Values[i] = ec._Mutation_createOrUpdateSSID(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -1713,8 +1807,18 @@ func (ec *executionContext) _SSID(ctx context.Context, sel ast.SelectionSet, obj
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("SSID")
-		case "text":
-			out.Values[i] = ec._SSID_text(ctx, field, obj)
+		case "ID":
+			out.Values[i] = ec._SSID_ID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Content":
+			out.Values[i] = ec._SSID_Content(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Anchor":
+			out.Values[i] = ec._SSID_Anchor(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -1980,6 +2084,20 @@ func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interf
 
 func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.SelectionSet, v bool) graphql.Marshaler {
 	res := graphql.MarshalBoolean(v)
+	if res == graphql.Null {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	return graphql.UnmarshalInt(v)
+}
+
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
 	if res == graphql.Null {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")

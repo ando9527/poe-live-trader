@@ -13,3 +13,19 @@ We will do this in game.
 1. Search the item in 
 2. Get the filter string "8GvyvVFV" in https://www.pathofexile.com/trade/search/Legion/8GvyvVFV
 3. Fill in .env
+
+### Graphql Query
+```graphql
+query  {
+  ssid {
+    Content
+  }
+}
+
+
+mutation {
+  createOrUpdateSSID(input: { Content: "123456789" }) {
+    Content
+  }
+}
+```

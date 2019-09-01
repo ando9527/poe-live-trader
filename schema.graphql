@@ -6,7 +6,7 @@ schema {
 }
 
 type Mutation {
-    createSSID(input: NewSSID!): SSID!
+    createOrUpdateSSID(input: NewSSID!): SSID!
 }
 
 type Query {
@@ -14,9 +14,12 @@ type Query {
 }
 
 type SSID{
-    text: String!
+    ID: Int!
+    Content: String!
+    Anchor: String!
 }
 
 input NewSSID{
-    text: String!
+    Content: String!
 }
+

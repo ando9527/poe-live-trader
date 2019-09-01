@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/99designs/gqlgen/handler"
-	poe_live_trader "github.com/ando9527/poe-live-trader"
+	"github.com/ando9527/poe-live-trader/pkg/graphql"
 )
 
 const defaultPort = "8080"
@@ -18,7 +18,7 @@ func main() {
 	}
 
 	http.Handle("/", handler.Playground("GraphQL playground", "/query"))
-	http.Handle("/query", handler.GraphQL(poe_live_trader.NewExecutableSchema(poe_live_trader.Config{Resolvers: &poe_live_trader.Resolver{}})))
+	http.Handle("/query", handler.GraphQL(graphql.NewExecutableSchema(graphql.Config{Resolvers: &graphql.Resolver{}})))
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

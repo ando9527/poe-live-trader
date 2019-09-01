@@ -3,9 +3,11 @@
 package graphql
 
 type NewSsid struct {
-	Text string `json:"text"`
+	Content string `json:"Content"`
 }
 
 type Ssid struct {
-	Text string `json:"text"`
+	ID      int    `json:"ID"`
+	Content string `json:"Content"`
+	Anchor  string `json:"Anchor"`
 }
