@@ -10,7 +10,7 @@ exec:
 model:
   filename: models/models_gen.go
 resolver:
-  filename: resolver/resolver.go
+  filename: ../server/resolver.go
   type: Resolver
 autobind: []
 

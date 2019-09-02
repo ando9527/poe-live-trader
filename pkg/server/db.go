@@ -3,6 +3,7 @@ package server
 import (
 	"time"
 
+	"github.com/ando9527/poe-live-trader/pkg/graphql/models"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
@@ -27,15 +28,15 @@ func (s *Server) Connect() {
 }
 
 func (s *Server) InitTable() {
-	s.resolver.db.CreateTable(&Ssid{})
+	s.resolver.db.CreateTable(&models.Ssid{})
 }
 
 func (s *Server) DropTable() {
-	s.resolver.db.DropTableIfExists(&Ssid{})
+	s.resolver.db.DropTableIfExists(&models.Ssid{})
 }
 
 func (s *Server) Migration() {
-	s.resolver.db.AutoMigrate(&Ssid{})
+	s.resolver.db.AutoMigrate(&models.Ssid{})
 }
 
 

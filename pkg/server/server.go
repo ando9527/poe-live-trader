@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/99designs/gqlgen/handler"
+	"github.com/ando9527/poe-live-trader/pkg/graphql/graph"
 	"github.com/sirupsen/logrus"
 )
 
@@ -27,7 +28,7 @@ func NewServer(dsn string, user string, pass string, logLevel string) (s *Server
 		pass:     pass,
 		logLevel: logLevel,
 		resolver: &Resolver{
-			db: nil,
+			db: nil ,
 		},
 	}
 	s.routes()
@@ -39,7 +40,7 @@ func (s *Server) routes() {
 	p:= handler.Playground("GraphQL playground", "/query")
 	s.router.HandleFunc("/", p)
 
-	h:=handler.GraphQL(NewExecutableSchema(Config{Resolvers: s.resolver}))
+	h:=handler.GraphQL(graph.NewExecutableSchema(graph.Config{Resolvers: s.resolver}))
 	s.router.HandleFunc("/query", h)
 }
 
