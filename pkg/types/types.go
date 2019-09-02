@@ -4,7 +4,6 @@ import (
 	"time"
 )
 
-const ANCHOR = "ANCHOR"
 
 type ItemDetail struct {
 	Result []struct {

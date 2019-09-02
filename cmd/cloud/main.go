@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/ando9527/poe-live-trader/cmd/cloud/env"
-	"github.com/ando9527/poe-live-trader/pkg/graphql"
 	"github.com/ando9527/poe-live-trader/pkg/log"
+	"github.com/ando9527/poe-live-trader/pkg/server"
 	"github.com/sirupsen/logrus"
 )
 
