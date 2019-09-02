@@ -8,9 +8,9 @@ import (
 )
 
 func TestPostSSID(t *testing.T) {
-	server := httptest.NewServer(server.handleSSID())
-	PostSSID(server.URL, fakeData, "", "")
-	ssid := GetPOESSID(server.URL, TestUser, TestPass)
-	assert.Equal(t, fakeData, ssid)
+	server := httptest.NewServer(FakeServer.handleSSID())
+	PostSSID(server.URL, FakeSSID, "", "")
+	ssid := GetPOESSID(server.URL, FakeUSER, FakePASS)
+	assert.Equal(t, FakeSSID, ssid)
 
 }

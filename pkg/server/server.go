@@ -37,11 +37,11 @@ func NewServer(dsn string, user string, pass string, logLevel string) (s *Server
 }
 
 func (s *Server) routes() {
-	p:= handler.Playground("GraphQL playground", "/query")
+	p:= handler.Playground("GraphQL playground", "/graphql")
 	s.router.HandleFunc("/", p)
 
 	h:=handler.GraphQL(graph.NewExecutableSchema(graph.Config{Resolvers: s.resolver}))
-	s.router.HandleFunc("/query", h)
+	s.router.HandleFunc("/graphql", h)
 }
 
 func (s *Server) Run() {

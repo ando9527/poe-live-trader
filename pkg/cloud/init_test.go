@@ -1,18 +1,18 @@
 package cloud
 
-var fakeData = "123"
-var TestDsn = "root@tcp(localhost:3306)/test"
-var TestUser ="user"
-var TestPass ="pass"
-var TestLogLevel= "warn"
+var FakeSSID = "123"
+var FakeDSN = "root@tcp(localhost:3306)/test"
+var FakeUSER ="user"
+var FakePASS ="pass"
+var FakeLogLevel = "warn"
 
-var server *Server
+var FakeServer *Server
 
 func init(){
-	server = NewServer(TestDsn, TestUser, TestPass, TestLogLevel)
-	server.Connect()
-	if server.db.HasTable(&SSID{}){
-		server.DropTable()
+	FakeServer = NewServer(FakeDSN, FakeUSER, FakePASS, FakeLogLevel)
+	FakeServer.Connect()
+	if FakeServer.db.HasTable(&SSID{}){
+		FakeServer.DropTable()
 	}
-	server.InitTable()
+	FakeServer.InitTable()
 }
