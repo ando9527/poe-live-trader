@@ -9,7 +9,7 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/ando9527/poe-live-trader/pkg/cloud"
+	"github.com/ando9527/poe-live-trader/pkg/server"
 	"github.com/ando9527/poe-live-trader/pkg/types"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
@@ -108,8 +108,11 @@ func (c *Client)getHeader() (header http.Header) {
 		cookie := fmt.Sprintf("POESESSID=%s", c.Config.envPOESSID)
 		header.Add("Cookie", cookie)
 	}else{
-		ssid:=cloud.GetPOESSID(c.Config.CloudURL,c.Config.User,c.Config.Pass)
-		cookie := fmt.Sprintf("POESESSID=%s", ssid)
+		s, err := server.GetPOESSID(c.Config.CloudURL, c.Config.User, c.Config.Pass)
+		if err != nil {
+			panic(err)
+		}
+		cookie := fmt.Sprintf("POESESSID=%s", s)
 		header.Add("Cookie", cookie)
 	}
 
