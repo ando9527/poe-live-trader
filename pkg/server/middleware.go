@@ -1,8 +1,26 @@
 package server
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
+
+	"github.com/99designs/gqlgen/graphql"
+	"github.com/vektah/gqlparser/gqlerror"
 )
+func sendErrorf(w http.ResponseWriter, code int, format string, args ...interface{}) {
+	sendError(w, code, &gqlerror.Error{Message: fmt.Sprintf(format, args...)})
+}
+
+func sendError(w http.ResponseWriter, code int, errors ...*gqlerror.Error) {
+	w.WriteHeader(code)
+	b, err := json.Marshal(&graphql.Response{Errors: errors})
+	if err != nil {
+		panic(err)
+	}
+	_, _ = w.Write(b)
+}
+
 
 func (s *Server)handleAuth(h http.HandlerFunc) http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request){
@@ -11,6 +29,7 @@ func (s *Server)handleAuth(h http.HandlerFunc) http.HandlerFunc{
 			http.Error(w, "Not Authorized", http.StatusUnauthorized)
 			return
 		}
+
 		h(w,r)
 	}
 }

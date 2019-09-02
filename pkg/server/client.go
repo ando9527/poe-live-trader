@@ -8,6 +8,7 @@ import (
 
 func UpdateSSID(url string, poessid string, user string, pass string)(err error) {
 	c := client.New(url)
+
 	query:=fmt.Sprintf(`
 	mutation {
 		createOrUpdateSSID(input: { Content: "%s" }) {

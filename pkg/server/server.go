@@ -37,11 +37,15 @@ func NewServer(dsn string, user string, pass string, logLevel string) (s *Server
 }
 
 func (s *Server) routes() {
-	p:= handler.Playground("GraphQL playground", "/graphql")
-	s.router.HandleFunc("/", p)
+	//p:= handler.Playground("GraphQL playground", "/graphql")
+	//s.router.HandleFunc("/", p)
 
 	h:=handler.GraphQL(graph.NewExecutableSchema(graph.Config{Resolvers: s.resolver}))
+	h=s.handleAuth(h)
+
 	s.router.HandleFunc("/graphql", h)
+
+
 }
 
 func (s *Server) Run() {
@@ -50,7 +54,7 @@ func (s *Server) Run() {
 		port = "8080"
 	}
 	s.Connect()
-	logrus.Debugf("connect to http://localhost:%s/ for GraphQL playground", port)
+	//logrus.Debugf("connect to http://localhost:%s/ for GraphQL playground", port)
 	logrus.Panic(http.ListenAndServe(fmt.Sprintf(":%s", port), s.router))
 }
 

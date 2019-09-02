@@ -6,4 +6,4 @@ services:
     env_file:
       - example.cloud.env
     ports:
-      - "9999:9999"
+      - "9999:8080"
