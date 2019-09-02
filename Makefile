@@ -40,6 +40,8 @@ cp:
 deps:
 	go mod download
 
+gen:
+	cd pkg/graphql; go run github.com/99designs/gqlgen -v
 
 dockerbuild:
 	docker build --build-arg VERSION=${VERSION} --build-arg PROJECT=${PROJECT} --build-arg SSH_PRIVATE_KEY="${SSH_PRIVATE_KEY}" -t gcr.io/eve-vpn/${PROJECT}:latest -t gcr.io/eve-vpn/${PROJECT}:${VERSION} .

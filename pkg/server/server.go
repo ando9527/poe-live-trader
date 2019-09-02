@@ -1,5 +1,5 @@
 // Package p contains an ht Cloud Function.
-package graphql
+package server
 
 import (
 	"fmt"
@@ -36,10 +36,8 @@ func NewServer(dsn string, user string, pass string, logLevel string) (s *Server
 }
 
 func (s *Server) routes() {
-
 	p:= handler.Playground("GraphQL playground", "/query")
 	s.router.HandleFunc("/", p)
-
 
 	h:=handler.GraphQL(NewExecutableSchema(Config{Resolvers: s.resolver}))
 	s.router.HandleFunc("/query", h)

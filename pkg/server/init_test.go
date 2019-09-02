@@ -1,4 +1,4 @@
-package graphql
+package server
 
 var fakeData = "123"
 var TestDsn = "root@tcp(localhost:3306)/test"
