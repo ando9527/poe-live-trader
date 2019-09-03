@@ -11,7 +11,6 @@ import (
 	"github.com/ando9527/poe-live-trader/pkg/graphql/graph"
 	"github.com/didip/tollbooth"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/sync/singleflight"
 )
 
 type Server struct {
@@ -22,7 +21,6 @@ type Server struct {
 	logLevel string
 	production bool
 	resolver *Resolver
-	requestGroup *singleflight.Group
 }
 
 func NewServer(dsn string, user string, pass string, logLevel string, production bool) (s *Server) {
@@ -36,7 +34,6 @@ func NewServer(dsn string, user string, pass string, logLevel string, production
 		resolver: &Resolver{
 			db: nil ,
 		},
-		requestGroup: &singleflight.Group{},
 	}
 	s.routes()
 
@@ -69,11 +66,3 @@ func (s *Server) Run() {
 	logrus.Panic(http.ListenAndServe(fmt.Sprintf(":%s", port), s.router))
 }
 
-func temp(){
-	//x:=func(w http.ResponseWriter, r *http.Request){
-	//
-	//}
-	//
-	//h:=http.HandlerFunc(x)
-	//h.ServeHTTP()
-}
