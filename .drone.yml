@@ -20,8 +20,6 @@ steps:
     pull: always
     image: golang:1.11
     cache_from: golang:1.11
-    environment:
-      GOPROXY: http://192.168.50.104:3000
     commands:
       - CGO_ENABLED=0 go build -ldflags="-X main.version=${DRONE_COMMIT_BRANCH}-${DRONE_COMMIT:0:8}" -o release/app github.com/${DRONE_REPO}/cmd/cloud
 
