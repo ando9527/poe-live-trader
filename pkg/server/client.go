@@ -15,7 +15,6 @@ func basicAuth(header *http.Header, username, password string)  {
 
 func UpdateSSID(url string, poessid string, user string, pass string)(err error) {
 	client := graphql.NewClient(url)
-
 	req := graphql.NewRequest(`
 	mutation ($key: String!){
 	  createOrUpdateSSID(input: { Content: $key }) {
@@ -31,6 +30,7 @@ func UpdateSSID(url string, poessid string, user string, pass string)(err error)
 	if err := client.Run(ctx, req, nil); err != nil {
 		return err
 	}
+	
 	return err
 }
 

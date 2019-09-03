@@ -32,7 +32,7 @@ clean:
 		rm -rf ./build
 
 mkdir-build:
-	mkdir build	
+	mkdir -p build
 	
 cp:
 	cp audio.wav build/
@@ -49,5 +49,8 @@ dockerbuild:
 dockerpush:
 	docker push gcr.io/eve-vpn/${PROJECT}:${VERSION}
 	docker push gcr.io/eve-vpn/${PROJECT}:latest
+
+build-admin: mkdir-build
+	$(GOBUILD) -o build/admin.exe -ldflags "-X main.version=${VERSION}" cmd/admin/main.go
 
 .PHONY: build

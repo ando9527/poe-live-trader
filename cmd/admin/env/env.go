@@ -15,22 +15,22 @@ type Env struct {
 	Pass string `required:"true" split_words:"true"`
 }
 
-type Auth struct{
-	GoogleApplicationCredentials  string `required:"true" split_words:"true"`
-}
-
-func InitAuth(){
-	auth:=Auth{}
-	err := envconfig.Process("", &auth)
-	if err != nil {
-		logrus.Panic(errors.Wrap(err, "Please setup .env file properly"))
-	}
-}
+//type Auth struct{
+//	GoogleApplicationCredentials  string `required:"true" split_words:"true"`
+//}
+//
+//func InitAuth(){
+//	auth:=Auth{}
+//	err := envconfig.Process("", &auth)
+//	if err != nil {
+//		logrus.Panic(errors.Wrap(err, "Please setup .env file properly"))
+//	}
+//}
 
 
 
 func NewEnv() (cfg Env) {
-	InitAuth()
+	//InitAuth()
 	cfg = Env{}
 	err := envconfig.Process("admin", &cfg)
 	if err != nil {

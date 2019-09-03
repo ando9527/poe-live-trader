@@ -29,7 +29,7 @@ func main(){
 	if poessid!=""{
 		fmt.Println("poessid", poessid)
 		fmt.Println(env.CloudUrl)
-		e := server.UpdateSSID(env.CloudUrl, poessid, env.User, env.User)
+		e := server.UpdateSSID(env.CloudUrl, poessid, env.User, env.Pass)
 		if e != nil {
 			panic(e)
 		}
