@@ -7,13 +7,13 @@ platform:
   arch: amd64
 
 steps:
-  - name: test
-    image: golang:1.11
-    cache_from: golang:1.11
-    environment:
-      GOPROXY: http://192.168.50.104:3000
-    commands:
-      - go test -v ./...
+#  - name: test
+#    image: golang:1.11
+#    cache_from: golang:1.11
+#    environment:
+#      GOPROXY: http://192.168.50.104:3000
+#    commands:
+#      - go test -v ./...
 
 
   - name: build-push
@@ -67,11 +67,11 @@ steps:
     when:
       status: [ success, failure ]
 
-services:
-  - name: database
-    image: mysql:5.7
-    ports:
-      - 3306
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-      MYSQL_DATABASE: test
+#services:
+#  - name: database
+#    image: mysql:5.7
+#    ports:
+#      - 3306
+#    environment:
+#      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+#      MYSQL_DATABASE: test
