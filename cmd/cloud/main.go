@@ -16,6 +16,6 @@ func main(){
 	cfg := env.NewEnv()
 	log.InitCloudLogger(cfg.LogLevel)
 	logrus.Info("version ", version )
-	s := server.NewServer(cfg.Dsn, cfg.User, cfg.Pass, cfg.LogLevel)
+	s := server.NewServer(cfg.Dsn, cfg.User, cfg.Pass, cfg.LogLevel, true)
 	s.Run()
 }

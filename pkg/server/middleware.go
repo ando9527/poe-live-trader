@@ -33,3 +33,4 @@ func (s *Server)handleAuth(h http.HandlerFunc) http.HandlerFunc{
 		h(w,r)
 	}
 }
+

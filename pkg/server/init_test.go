@@ -13,7 +13,7 @@ var FakeLogLevel = "warn"
 var FakeServer *Server
 
 func init(){
-	FakeServer = NewServer(FakeDSN, FakeUser, FakePass, FakeLogLevel)
+	FakeServer = NewServer(FakeDSN, FakeUser, FakePass, FakeLogLevel, false)
 	FakeServer.Connect()
 
 	if FakeServer.resolver.db.HasTable(&models.Ssid{}){

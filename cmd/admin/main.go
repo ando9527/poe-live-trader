@@ -36,7 +36,7 @@ func main(){
 	}
 	//migration
 	if migration==true{
-		s := server.NewServer(env.Dsn, env.User, env.Pass, env.LogLevel)
+		s := server.NewServer(env.Dsn, env.User, env.Pass, env.LogLevel, true)
 		s.Connect()
 		s.Migration()
 	}
