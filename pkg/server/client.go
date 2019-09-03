@@ -1,50 +1,59 @@
 package server
 
 import (
+	"context"
+	"encoding/base64"
 	"fmt"
+	"net/http"
 
-	"github.com/99designs/gqlgen/client"
+	"github.com/machinebox/graphql"
 )
+func basicAuth(header *http.Header, username, password string)  {
+	auth := username + ":" + password
+	header.Add("Authorization", fmt.Sprintf("Basic %s",base64.StdEncoding.EncodeToString([]byte(auth))))
+}
 
 func UpdateSSID(url string, poessid string, user string, pass string)(err error) {
-	c := client.New(url)
+	client := graphql.NewClient(url)
 
-	query:=fmt.Sprintf(`
-	mutation {
-		createOrUpdateSSID(input: { Content: "%s" }) {
-			Content
-		}
+	req := graphql.NewRequest(`
+	mutation ($key: String!){
+	  createOrUpdateSSID(input: { Content: $key }) {
+		Content
+	  }
 	}
-`,poessid)
-	var resp interface{}
-	err = c.Post(query,&resp )
-	if err != nil {
+`)
+	req.Var("key", poessid)
+	basicAuth(&req.Header, user,pass)
+	req.Header.Set("Cache-Control", "no-cache")
+
+	ctx := context.Background()
+	if err := client.Run(ctx, req, nil); err != nil {
 		return err
 	}
-	return nil
+	return err
 }
 
 func GetPOESSID(cloudURL string, user string, pass string) (ssid string, err error) {
-
-	query:=`
+	client := graphql.NewClient(cloudURL)
+	req := graphql.NewRequest(`
 	query  {
 	  ssid {
 		Content
 	  }
 	}
-`
+`)
+	req.Header.Set("Cache-Control", "no-cache")
+	basicAuth(&req.Header, user,pass)
+	ctx := context.Background()
 	resp:=struct{
 		Ssid struct{
 			Content string
 		}
 	}{}
-
-	c:=client.New(cloudURL)
-	err = c.Post(query, &resp)
-	if err != nil {
-		return "", err
+	if err := client.Run(ctx, req, &resp); err != nil {
+		return "",err
 	}
-
-	return resp.Ssid.Content, nil
+	return resp.Ssid.Content,err
 }
 
