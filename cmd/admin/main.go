@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 
 	"github.com/ando9527/poe-live-trader/cmd/admin/env"
 	"github.com/ando9527/poe-live-trader/pkg/log"
@@ -14,7 +15,7 @@ var (poessid string
     migration bool
 )
 func init(){
-	flag.BoolVar(&migration, "m", false, "execute migration?")
+	flag.BoolVar(&migration, "m", false, "Execute migration")
 	flag.StringVar(&poessid, "i", "", "Insert POESSID")
 }
 func main(){
@@ -25,6 +26,10 @@ func main(){
 	env := env.NewEnv()
 	log.InitLogger(env.LogLevel)
 	flag.Parse()
+	if len(os.Args)<=1{
+		flag.Usage()
+	}
+
 	//insert poessid
 	if poessid!=""{
 		fmt.Println("poessid", poessid)
