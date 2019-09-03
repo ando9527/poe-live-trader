@@ -37,14 +37,9 @@ func NewServer(dsn string, user string, pass string, logLevel string) (s *Server
 }
 
 func (s *Server) routes() {
-
-
 	h:=handler.GraphQL(graph.NewExecutableSchema(graph.Config{Resolvers: s.resolver}))
 	h=s.handleAuth(h)
-
 	s.router.HandleFunc("/graphql", h)
-
-
 }
 
 func (s *Server) Run() {

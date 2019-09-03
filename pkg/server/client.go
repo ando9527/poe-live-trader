@@ -56,4 +56,3 @@ func GetPOESSID(cloudURL string, user string, pass string) (ssid string, err err
 	}
 	return resp.Ssid.Content,err
 }
-
