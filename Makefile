@@ -23,18 +23,18 @@ run:
 dev:
 	$(GODOTENV) $(GOCMD) run -ldflags "-X main.version=${VERSION}" cmd/client/main.go
 
-build: mkdir-build cp
+build: mkdir-build cp-audio
 	$(GOBUILD) -o build/${PROJECT}.exe -ldflags "-X main.version=${VERSION}" cmd/client/main.go
 
 test:
-	$(GODOTENV) $(GOTEST) -v ./...
+	$(GOTEST) -v ./...
 clean:
 		rm -rf ./build
 
 mkdir-build:
 	mkdir -p build
 	
-cp:
+cp-audio:
 	cp audio.wav build/
 
 deps:
@@ -53,4 +53,4 @@ dockerpush:
 build-admin: mkdir-build
 	$(GOBUILD) -o build/admin.exe -ldflags "-X main.version=${VERSION}" cmd/admin/main.go
 
-.PHONY: build
+.PHONY: build test

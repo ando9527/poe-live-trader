@@ -12,6 +12,7 @@ import (
 	"github.com/ando9527/poe-live-trader/pkg/ws"
 	"github.com/atotto/clipboard"
 	"github.com/joho/godotenv"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -31,7 +32,12 @@ func main() {
 		pause()
 		return
 	}
-	cfg:= env.NewEnv()
+	cfg, err:= env.NewEnv()
+	if err != nil {
+		logrus.Error(errors.Wrap(err, "Please setup .env file properly"))
+		pause()
+		return
+	}
 
 
 	log.InitLogger(cfg.LogLevel)

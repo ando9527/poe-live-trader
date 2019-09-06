@@ -2,8 +2,6 @@ package env
 
 import (
 	"github.com/kelseyhightower/envconfig"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 
@@ -21,11 +19,11 @@ type Env struct {
 
 }
 
-func NewEnv()(cfg Env)  {
+func NewEnv()(cfg Env, err error)  {
 	cfg = Env{}
-	err := envconfig.Process("client", &cfg)
+	err = envconfig.Process("client", &cfg)
 	if err != nil {
-		logrus.Panic(errors.Wrap(err, "Please setup .env file properly"))
+		return cfg, err
 	}
-	return cfg
+	return cfg, nil
 }

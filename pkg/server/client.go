@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/machinebox/graphql"
+	"github.com/sirupsen/logrus"
 )
 func basicAuth(header *http.Header, username, password string)  {
 	auth := username + ":" + password
@@ -54,5 +55,6 @@ func GetPOESSID(cloudURL string, user string, pass string) (ssid string, err err
 	if err := client.Run(ctx, req, &resp); err != nil {
 		return "",err
 	}
+	logrus.Debug("Get POESSID from cloud ", resp.Ssid.Content)
 	return resp.Ssid.Content,err
 }
