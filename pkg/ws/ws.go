@@ -104,8 +104,9 @@ func (c *Client)getHeader() (header http.Header) {
 	header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36")
 
 	if c.Config.CloudEnable == false {
-		logrus.Debug("using local poessid")
-		cookie := fmt.Sprintf("POESESSID=%s", c.Config.envPOESSID)
+
+		logrus.Debug("using local poessid, ", os.Getenv("CLIENT_POESESSID"))
+		cookie := fmt.Sprintf("POESESSID=%s", os.Getenv("CLIENT_POESESSID"))
 		header.Add("Cookie", cookie)
 	}else{
 		s, err := server.GetPOESSID(c.Config.CloudURL, c.Config.User, c.Config.Pass)
