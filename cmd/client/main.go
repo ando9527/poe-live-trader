@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	_ "net/http/pprof"
 )
 
 var (
@@ -26,6 +28,9 @@ func pause() {
 }
 
 func main() {
+	go func() {
+		logrus.Info(http.ListenAndServe("localhost:6060", nil))
+	}()
 	err := godotenv.Load("client.env")
 	if err != nil {
 		logrus.Error("Error loading client.env file")
@@ -52,6 +57,7 @@ func main() {
 		Filter:      cfg.Filter,
 	}
 	client := trader.NewTrader(config)
+
 	client.Launch()
 
 
@@ -60,8 +66,7 @@ func main() {
 	for {
 		select {
 		case result := <-whisper:
-			fmt.Println(result)
-			audio.Play(cfg.Volume)
+			logrus.Info(result)
 			client.Mutex.Lock()
 			if client.IDCache[getName(result)]{
 				continue
@@ -69,6 +74,7 @@ func main() {
 			client.LocalServer.Message<-result
 			client.IDCache[getName(result)]=true
 			client.Mutex.Unlock()
+			audio.Play(cfg.Volume)
 			//if err != nil {
 			//	logrus.Warn("failed copy whisper to clipboard.")
 			//}

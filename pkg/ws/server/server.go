@@ -39,11 +39,11 @@ func NewServer()(s *Server) {
 	server := &Server{
 		Message: make(chan string),
 	}
-	go func(){
-		if err := http.ListenAndServe(":9527", server); err != nil {
-			logrus.Fatal(err)
-		}
-	}()
+	//go func(){
+	//	if err := http.ListenAndServe(":9527", server); err != nil {
+	//		logrus.Fatal(err)
+	//	}
+	//}()
 
 	return server
 }

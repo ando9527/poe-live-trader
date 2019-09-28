@@ -32,9 +32,9 @@ class Client extends WebSocket
 	{
 		message:=Event.data
 		if (this.toggle){
-			Send, {Enter}
-			Send, %message%
-			Send, {Enter}
+			SendInput, {Enter}
+			SendInput, %message%
+			SendInput, {Enter}
 		}
 
 		; MsgBox, % "Received Data: " message

@@ -20,10 +20,20 @@ type Trader struct {
 func NewTrader(wsConfig ws.Config) (t *Trader) {
 	t = &Trader{}
 	t.Whisper = make(chan string)
-	t.WebsocketClient = ws.NewClient(wsConfig)
+	t.WebsocketClient = ws.NewClient( wsConfig)
 	t.RequestClient = request.NewRequestClient(wsConfig.Filter)
 	t.LocalServer = server.NewServer()
 	t.IDCache = map[string]bool{}
+
+	//go func(){
+	//	for{
+	//		time.After(time.Minute*30)
+	//		t.Mutex.Lock()
+	//		t.IDCache = map[string]bool{}
+	//		t.Mutex.Unlock()
+	//	}
+	//}()
+
 	return t
 }
 func (t *Trader) Launch() {
@@ -34,14 +44,14 @@ func (t *Trader) Launch() {
 	go func() {
 		for {
 			select {
-			case result := <-t.WebsocketClient.ItemID:
-				// get detail of item from http server
-				go func() {
-					itemDetail := t.RequestClient.RequestItemDetail(result)
-					for _, result := range itemDetail.Result {
-						t.Whisper <- result.Listing.Whisper
-					}
-				}()
+				case result := <-t.WebsocketClient.ItemID:
+					// get detail of item from http server
+					go func() {
+						itemDetail := t.RequestClient.RequestItemDetail(result)
+						for _, result := range itemDetail.Result {
+							t.Whisper <- result.Listing.Whisper
+						}
+					}()
 			}
 		}
 	}()

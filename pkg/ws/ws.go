@@ -34,7 +34,6 @@ type Client struct {
 	Config Config
 	ServerURL string
 
-
 }
 
 func NewClient(cfg Config) *Client {
@@ -69,9 +68,17 @@ func (client *Client) ReadMessage() {
 				//if err != nil {
 				//	log.Println("close ws: ", err)
 				//}
-				logrus.Info("Reconnecting in 3 seconds..")
-				time.Sleep(time.Second*3)
-				client.Connect()
+				//logrus.Info("Reconnecting in 3 seconds..")
+				//time.Sleep(time.Second*3)
+				header := client.getHeader()
+				logrus.Infof("Connecting to %s", client.ServerURL)
+				dialer:=websocket.DefaultDialer
+				//dialer.HandshakeTimeout =90*time.Second
+				conn, _, err := dialer.Dial(client.ServerURL, header)
+				if err != nil {
+					logrus.Panic("dial:", err)
+				}
+				client.Conn= conn
 				return
 			}
 			log.Debug("Receive: ", string(bytes))
@@ -91,7 +98,7 @@ func (client *Client) Connect() {
 	header := client.getHeader()
 	logrus.Infof("Connecting to %s", client.ServerURL)
 	dialer:=websocket.DefaultDialer
-	dialer.HandshakeTimeout =90*time.Second
+	//dialer.HandshakeTimeout =90*time.Second
 	conn, _, err := dialer.Dial(client.ServerURL, header)
 	if err != nil {
 		logrus.Panic("dial:", err)
