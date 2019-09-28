@@ -52,15 +52,24 @@ func (client *Client) ReadMessage() {
 		itemID := types.ItemID{}
 		for {
 			_, bytes, err := client.Conn.ReadMessage()
+
+			if e, ok :=  err.(*websocket.CloseError); ok && e.Code == websocket.CloseNormalClosure {
+				log.Info("WS close normal")
+				return
+			}
 			if err != nil {
 				log.Error(errors.Wrap(err, "websocket read message error"))
+				logrus.Info("Reconnecting in 2 seconds..")
+				time.Sleep(time.Second*5)
+				client.ReConnect()
 				return
 			}
 			log.Debug("Receive: ", string(bytes))
 
 			err = json.Unmarshal(bytes, &itemID)
 			if err != nil {
-				panic(err)
+				logrus.Error(err)
+				continue
 			}
 			client.ItemID <- itemID.New
 		}
@@ -72,7 +81,9 @@ func (client *Client) ReConnect() {
 	header := client.getHeader()
 	for {
 		logrus.Infof("Connecting to %s", client.ServerURL)
-		conn, _, err := websocket.DefaultDialer.Dial(client.ServerURL, header)
+		dialer:=websocket.DefaultDialer
+		dialer.HandshakeTimeout =90*time.Second
+		conn, _, err := dialer.Dial(client.ServerURL, header)
 		if err == nil {
 			log.Info("Connected websocket server!")
 			client.Conn = conn
