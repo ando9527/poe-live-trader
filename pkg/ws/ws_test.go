@@ -15,7 +15,7 @@ func TestClient_GetItemID(t *testing.T) {
 
 	client := FakeNewWebsocketClient(server.URL)
 	expect := []string{"6bf0738f765b4d364fc65105910493c13b3d89ded2797cbcca32b99ca0579825"}
-	client.ReConnect()
+	client.Connect()
 	defer client.Conn.Close()
 
 	select {

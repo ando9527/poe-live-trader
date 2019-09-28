@@ -36,7 +36,7 @@ func FakeWebsocketServer() (server *httptest.Server) {
 }
 
 func FakeNewWebsocketClient(serverURL string) (client *Client) {
-	newURL := "ws" + strings.TrimPrefix(serverURL, "http") + "/"
+	newURL := "wss" + strings.TrimPrefix(serverURL, "http") + "/"
 	client = &Client{ItemID: make(chan []string), ServerURL: newURL,}
 	return client
 }

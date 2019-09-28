@@ -55,13 +55,24 @@ func (client *Client) ReadMessage() {
 
 			if e, ok :=  err.(*websocket.CloseError); ok && e.Code == websocket.CloseNormalClosure {
 				log.Info("WS close normal")
-				return
+				logrus.Exit(0)
 			}
+			//if e, ok :=  err.(*websocket.CloseError); ok && e.Code == websocket.CloseAbnormalClosure {
+			//	log.Warn(err)
+			//	return
+			//}
+
 			if err != nil {
 				log.Error(errors.Wrap(err, "websocket read message error"))
-				logrus.Info("Reconnecting in 2 seconds..")
-				time.Sleep(time.Second*5)
-				client.ReConnect()
+				client.Conn.Close()
+				//log.Info("Disconnecting..")
+				//err := client.Conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+				//if err != nil {
+				//	log.Println("close ws: ", err)
+				//}
+				logrus.Info("Reconnecting in 3 seconds..")
+				time.Sleep(time.Second*3)
+				client.Connect()
 				return
 			}
 			log.Debug("Receive: ", string(bytes))
@@ -77,25 +88,19 @@ func (client *Client) ReadMessage() {
 	}()
 }
 
-func (client *Client) ReConnect() {
+func (client *Client) Connect() {
 	header := client.getHeader()
-	for {
-		logrus.Infof("Connecting to %s", client.ServerURL)
-		dialer:=websocket.DefaultDialer
-		dialer.HandshakeTimeout =90*time.Second
-		conn, _, err := dialer.Dial(client.ServerURL, header)
-		if err == nil {
-			log.Info("Connected websocket server!")
-			client.Conn = conn
-			client.ReadMessage()
-			return
-		} else {
-			logrus.Panic("dial:", err)
-		}
-		logrus.Info("Reconnect in 5 sec..")
-		time.Sleep(5 * time.Second)
-		logrus.Info("Reconnecting...")
+	logrus.Infof("Connecting to %s", client.ServerURL)
+	dialer:=websocket.DefaultDialer
+	dialer.HandshakeTimeout =90*time.Second
+	conn, _, err := dialer.Dial(client.ServerURL, header)
+	if err != nil {
+		logrus.Panic("dial:", err)
 	}
+	log.Info("Connected websocket server!")
+	client.Conn = conn
+	client.ReadMessage()
+
 
 }
 
@@ -113,7 +118,7 @@ func (c *Client)getHeader() (header http.Header) {
 	header.Add("Accept-Language", "en-US,en;q=0.9,zh-TW;q=0.8,zh;q=0.7,zh-CN;q=0.6,ja;q=0.5")
 	header.Add("Cache-Control", "no-cache")
 	header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36")
-
+	//header.Add("__cfduid","d8359ce94e004bd726a7d96bdd7ffeb011563189723")
 	if c.Config.CloudEnable == false {
 
 		logrus.Debug("using local poessid, ", os.Getenv("CLIENT_POESESSID"))

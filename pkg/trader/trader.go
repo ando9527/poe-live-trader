@@ -19,7 +19,7 @@ func NewTrader(wsConfig ws.Config) (t *Trader) {
 	return t
 }
 func (t *Trader) Launch() {
-	t.WebsocketClient.ReConnect()
+	t.WebsocketClient.Connect()
 	t.WebsocketClient.NotifyDC()
 
 	// get item id from websocket server
