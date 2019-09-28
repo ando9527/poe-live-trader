@@ -4,13 +4,13 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/ando9527/poe-live-trader/cmd/client/env"
 	"github.com/ando9527/poe-live-trader/pkg/audio"
 	"github.com/ando9527/poe-live-trader/pkg/log"
 	"github.com/ando9527/poe-live-trader/pkg/trader"
 	"github.com/ando9527/poe-live-trader/pkg/ws"
-	"github.com/atotto/clipboard"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -53,17 +53,30 @@ func main() {
 	}
 	client := trader.NewTrader(config)
 	client.Launch()
+
+
 	whisper := client.Whisper
+
 	for {
 		select {
 		case result := <-whisper:
 			fmt.Println(result)
 			audio.Play(cfg.Volume)
-			err := clipboard.WriteAll(result)
-			if err != nil {
-				logrus.Warn("failed copy whisper to clipboard.")
+			client.Mutex.Lock()
+			if client.IDCache[getName(result)]{
+				continue
 			}
+			client.LocalServer.Message<-result
+			client.IDCache[getName(result)]=true
+			client.Mutex.Unlock()
+			//if err != nil {
+			//	logrus.Warn("failed copy whisper to clipboard.")
+			//}
 		}
 	}
 
+}
+
+func getName(template string)(n string){
+	return strings.Split(template, " ")[0]
 }

@@ -1,14 +1,20 @@
 package trader
 
 import (
+	"sync"
+
 	"github.com/ando9527/poe-live-trader/pkg/request"
 	"github.com/ando9527/poe-live-trader/pkg/ws"
+	"github.com/ando9527/poe-live-trader/pkg/ws/server"
 )
 
 type Trader struct {
 	Whisper         chan string
 	WebsocketClient *ws.Client
 	RequestClient   *request.Client
+	LocalServer *server.Server
+	IDCache map[string]bool
+	sync.Mutex
 }
 
 func NewTrader(wsConfig ws.Config) (t *Trader) {
@@ -16,6 +22,8 @@ func NewTrader(wsConfig ws.Config) (t *Trader) {
 	t.Whisper = make(chan string)
 	t.WebsocketClient = ws.NewClient(wsConfig)
 	t.RequestClient = request.NewRequestClient(wsConfig.Filter)
+	t.LocalServer = server.NewServer()
+	t.IDCache = map[string]bool{}
 	return t
 }
 func (t *Trader) Launch() {

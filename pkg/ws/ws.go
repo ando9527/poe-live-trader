@@ -9,7 +9,6 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/ando9527/poe-live-trader/pkg/server"
 	"github.com/ando9527/poe-live-trader/pkg/types"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
@@ -107,7 +106,7 @@ func (client *Client) Connect() {
 
 func getServerURL(league string, filter string) (serverUrl string) {
 	urlPath := fmt.Sprintf("/api/trade/live/%s/%s", league, filter)
-	u := url.URL{Scheme: "wss", Host: "www.pathofexile.com", Path: urlPath}
+	u := url.URL{Scheme: "ws", Host: "www.pathofexile.com", Path: urlPath}
 	return u.String()
 }
 
@@ -119,19 +118,11 @@ func (c *Client)getHeader() (header http.Header) {
 	header.Add("Cache-Control", "no-cache")
 	header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36")
 	//header.Add("__cfduid","d8359ce94e004bd726a7d96bdd7ffeb011563189723")
-	if c.Config.CloudEnable == false {
 
-		logrus.Debug("using local poessid, ", os.Getenv("CLIENT_POESESSID"))
-		cookie := fmt.Sprintf("POESESSID=%s", os.Getenv("CLIENT_POESESSID"))
-		header.Add("Cookie", cookie)
-	}else{
-		s, err := server.GetPOESSID(c.Config.CloudURL, c.Config.User, c.Config.Pass)
-		if err != nil {
-			panic(err)
-		}
-		cookie := fmt.Sprintf("POESESSID=%s", s)
-		header.Add("Cookie", cookie)
-	}
+	logrus.Debug("using local poessid, ", os.Getenv("CLIENT_POESESSID"))
+	cookie := fmt.Sprintf("POESESSID=%s", os.Getenv("CLIENT_POESESSID"))
+	header.Add("Cookie", cookie)
+
 
 	return header
 }
