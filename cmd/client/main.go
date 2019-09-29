@@ -68,10 +68,6 @@ func main() {
 	logrus.Infof("Poe Live Trader %s", version)
 
 	config:=		ws.Config{
-		CloudEnable: cfg.CloudEnable,
-		CloudURL:    cfg.CloudUrl,
-		User:        cfg.User,
-		Pass:        cfg.Pass,
 		League:      cfg.League,
 		Filter:      cfg.Filter,
 	}

@@ -18,11 +18,7 @@ import (
 
 
 type Config struct{
-	CloudEnable bool
 	envPOESSID string
-	CloudURL string
-	User string
-	Pass string
 	League string
 	Filter string
 }

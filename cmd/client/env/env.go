@@ -12,11 +12,6 @@ type Env struct {
 	Poesessid   string  `required:"true" split_words:"true"`
 	Filter      string  `required:"true" split_words:"true"`
 	Volume      float64 `required:"true" split_words:"true"`
-	CloudEnable bool    `required:"true" split_words:"true"`
-	CloudUrl    string  `required:"true" split_words:"true"`
-	Pass        string	`required:"true" split_words:"true"`
-	User        string  `required:"true" split_words:"true"`
-
 }
 
 func NewEnv()(cfg Env, err error)  {
