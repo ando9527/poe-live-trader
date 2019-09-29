@@ -91,6 +91,7 @@ func main() {
 			logrus.Info(result)
 			client.Mutex.Lock()
 			if client.IDCache[getName(result)]{
+				logrus.Debug("duplicated user in cache, ",getName(result))
 				continue
 			}
 			client.LocalServer.Message<-result

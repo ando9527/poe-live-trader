@@ -41,12 +41,12 @@ type Client struct {
 func NewClient(ctx context.Context, cfg Config) *Client {
 	serverURL := getServerURL(cfg.League, cfg.Filter)
 	return &Client{
-		ItemID:    make(chan []string),
-		Conn:      nil,
-		Config:    cfg,
-		ServerURL: serverURL,
-		dcChan:    make(chan struct{}),
-		ctx:       ctx,
+		ItemID:        make(chan []string),
+		Conn:          nil,
+		Config:        cfg,
+		ServerURL:     serverURL,
+		dcChan:        make(chan struct{}),
+		ctx:           ctx,
 	}
 }
 func (client *Client) ReadMessage() {
@@ -55,11 +55,11 @@ func (client *Client) ReadMessage() {
 		for {
 			_, bytes, err := client.Conn.ReadMessage()
 
-			if e, ok :=  err.(*websocket.CloseError); ok && e.Code == websocket.CloseAbnormalClosure {
-				logrus.Warn(err)
-				return
-			}
-
+			//if e, ok :=  err.(*websocket.CloseError); ok && e.Code == websocket.CloseAbnormalClosure {
+			//	logrus.Warn(err)
+			//	return
+			//}
+		//websocket: close 1006 (abnormal closure): unexpected EOF
 			if err != nil {
 				logrus.Error(errors.Wrap(err, "websocket read message error"))
 				client.dcChan<-struct{}{}

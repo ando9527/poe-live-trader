@@ -12,6 +12,7 @@ type Server struct {
 	Message chan string
 	ctx context.Context
 	router *http.ServeMux
+	clientConn *websocket.Conn
 }
 
 func (s *Server) handler(w http.ResponseWriter, r *http.Request) {
@@ -22,27 +23,18 @@ func (s *Server) handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	logrus.Info("Headers", r.Header)
+	s.clientConn = conn
 	// Read messages from socket
 
-	for {
-		select {
-		case m:=<-s.Message:
-			logrus.Debug("Recv ", m )
-			send := []byte(m)
-			err:= conn.WriteMessage(1, send)
-			if err != nil {
-				logrus.Warn("Closing this connection, err ", err)
-				return
-			}
-		}
-	}
+
 }
 
 func NewServer(ctx context.Context)( s *Server) {
 	server := &Server{
-		Message: make(chan string),
-		ctx:     ctx,
-		router:  http.NewServeMux(),
+		Message:    make(chan string),
+		ctx:        ctx,
+		router:     http.NewServeMux(),
+		clientConn: nil,
 	}
 	return server
 }
@@ -73,6 +65,28 @@ func (s *Server)Run(){
 					logrus.Warn(err)
 					return
 				}
+				return
+			}
+		}
+	}()
+
+	go func(){
+		for{
+			select{
+			case m:=<-s.Message:
+				logrus.Debug("Recv ", m )
+				send := []byte(m)
+				if s.clientConn==nil{
+					continue
+				}
+				err:= s.clientConn.WriteMessage(1, send)
+				if err != nil {
+					logrus.Warn("Closing this connection, err ", err)
+					return
+				}
+
+			case <-s.ctx.Done():
+				logrus.Info("shutdown http server")
 				return
 			}
 		}

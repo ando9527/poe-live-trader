@@ -16,6 +16,7 @@ type Client struct {
 }
 
 func (client *Client) RequestItemDetail(itemID []string) (itemDetail types.ItemDetail) {
+	logrus.Debug("requesting data from http url")
 	url := client.GetHTTPServerURL(itemID)
 	resp, err := http.Get(url)
 	if err != nil {
