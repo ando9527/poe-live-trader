@@ -38,7 +38,7 @@ func NotifyDC(cancel context.CancelFunc) {
 			select {
 			case <-interrupt:
 				cancel()
-				time.Sleep(time.Second)
+				time.Sleep(time.Second*2)
 				return
 			}
 		}

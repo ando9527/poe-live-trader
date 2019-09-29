@@ -2,7 +2,9 @@ package trader
 
 import (
 	"context"
+	"net"
 	"sync"
+	"time"
 
 	"github.com/ando9527/poe-live-trader/pkg/request"
 	"github.com/ando9527/poe-live-trader/pkg/ws"
@@ -25,7 +27,7 @@ func NewTrader(ctx context.Context, wsConfig ws.Config) (t *Trader) {
 		Whisper:         make(chan string),
 		WebsocketClient: ws.NewClient( ctx,wsConfig),
 		RequestClient:   request.NewRequestClient(wsConfig.Filter),
-		LocalServer:     server.NewServer(),
+		LocalServer:     server.NewServer(ctx),
 		IDCache:         map[string]bool{},
 		ctx:             ctx,
 	}
@@ -58,16 +60,28 @@ func (t *Trader) processItemID() {
 	}()
 }
 
+func (t *Trader) isPortInUsed()( ans bool){
+	conn, err := net.DialTimeout("tcp", net.JoinHostPort("127.0.0.1", "9527"), time.Second)
+	if err != nil {
+		logrus.Debug("testing port in used", err)
+	}
+	if conn != nil {
+		_ = conn.Close()
+		return true
+	}
+	return false
+}
+
 func (t *Trader) Launch() {
+	if t.isPortInUsed(){
+		logrus.Panic("9527 port in used")
+	}
 	err:=t.WebsocketClient.Run()
 	if err != nil {
 		logrus.Panic(err)
 	}
 	t.processItemID()
-	//t.WebsocketClient.NotifyDC()
 	t.LocalServer.Run()
 
-	// get item id from websocket server
-
-
 }
+

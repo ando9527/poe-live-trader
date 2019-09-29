@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -9,9 +10,11 @@ import (
 
 type Server struct {
 	Message chan string
+	ctx context.Context
+	router *http.ServeMux
 }
 
-func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handler(w http.ResponseWriter, r *http.Request) {
 	// Upgrade connection
 	upgrader := websocket.Upgrader{CheckOrigin: Danger}
 	conn, err := upgrader.Upgrade(w, r, nil)
@@ -35,19 +38,43 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func NewServer()(s *Server) {
+func NewServer(ctx context.Context)( s *Server) {
 	server := &Server{
 		Message: make(chan string),
+		ctx:     ctx,
+		router:  http.NewServeMux(),
 	}
 	return server
 }
 
 func (s *Server)Run(){
+	port:=":9527"
+	s.router.HandleFunc("/",s.handler)
+	httpserver:=&http.Server{Addr:port, Handler:s.router}
+
 	go func(){
-		port:=":9527"
-		logrus.Debug("Local server listening port ", port)
-		if err := http.ListenAndServe(port , s); err != nil {
-			logrus.Panic(err)
+		//h:=http.HandlerFunc(s.handler)
+		err := httpserver.ListenAndServe()
+		if err == http.ErrServerClosed{
+			return
+		}
+		if err != nil {
+			panic(err)
+		}
+	}()
+
+	go func(){
+		for{
+			select{
+			case <-s.ctx.Done():
+				logrus.Info("shutdown http server")
+				err := httpserver.Shutdown(s.ctx)
+				if err != nil {
+					logrus.Warn(err)
+					return
+				}
+				return
+			}
 		}
 	}()
 
