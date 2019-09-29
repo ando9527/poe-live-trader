@@ -51,10 +51,11 @@ func (client *Client) ReadMessage() {
 		for {
 			_, bytes, err := client.Conn.ReadMessage()
 
-			//if e, ok :=  err.(*websocket.CloseError); ok && e.Code == websocket.CloseAbnormalClosure {
-			//	logrus.Warn(err)
-			//	return
-			//}
+			if e, ok :=  err.(*websocket.CloseError); ok && e.Code == websocket.ClosePolicyViolation {
+				client.dcChan<-struct{}{}
+				logrus.Warn("error 1008, ggg server crashed")
+				return
+			}
 		//websocket: close 1006 (abnormal closure): unexpected EOF
 			if err != nil {
 				logrus.Error(errors.Wrap(err, "websocket read message error"))
