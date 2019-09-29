@@ -8,13 +8,13 @@ import (
 
 	"github.com/ando9527/poe-live-trader/pkg/key"
 	"github.com/ando9527/poe-live-trader/pkg/request"
-	ws "github.com/ando9527/poe-live-trader/pkg/ws/client"
+	"github.com/ando9527/poe-live-trader/pkg/ws"
 	"github.com/sirupsen/logrus"
 )
 
 type Trader struct {
 	Whisper         chan string
-	WebsocketClient *ws.Client
+	WebsocketPool *ws.Pool
 	RequestClient   *request.Client
 	KeySim *key.Client
 	IDCache map[string]bool
@@ -24,13 +24,13 @@ type Trader struct {
 
 func NewTrader(ctx context.Context, wsConfig ws.Config) (t *Trader) {
 	t = &Trader{
-		Whisper:         make(chan string),
-		WebsocketClient: ws.NewClient(ctx, wsConfig),
-		RequestClient:   request.NewRequestClient(wsConfig.Filter),
-		KeySim:          key.NewClient(ctx),
-		IDCache:         map[string]bool{},
-		Mutex:           sync.Mutex{},
-		ctx:             ctx,
+		Whisper:       make(chan string),
+		WebsocketPool: ws.NewPool(ctx, wsConfig),
+		RequestClient: request.NewRequestClient(),
+		KeySim:        key.NewClient(ctx),
+		IDCache:       map[string]bool{},
+		Mutex:         sync.Mutex{},
+		ctx:           ctx,
 	}
 	//go func(){
 	//	for{
@@ -48,7 +48,7 @@ func (t *Trader) processItemID() {
 	go func() {
 		for {
 			select {
-			case result := <-t.WebsocketClient.ItemID:
+			case result := <-t.WebsocketPool.ItemStubChan:
 				// get detail of item from http server
 				go func() {
 					itemDetail := t.RequestClient.RequestItemDetail(result)
@@ -77,7 +77,7 @@ func (t *Trader) Launch() {
 	if t.isPortInUsed(){
 		logrus.Panic("9527 port in used")
 	}
-	err:=t.WebsocketClient.Run()
+	err:=t.WebsocketPool.Run()
 	if err != nil {
 		logrus.Panic(err)
 	}

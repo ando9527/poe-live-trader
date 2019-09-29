@@ -14,6 +14,7 @@ import (
 )
 
 func Play(name string, volume float64) {
+	logrus.Debug("Sound playing")
 	f, err := os.Open(fmt.Sprintf("%s.wav", name))
 	if err != nil {
 		log.Fatal(err)

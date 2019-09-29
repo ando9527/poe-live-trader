@@ -18,14 +18,14 @@ import (
 
 
 type Config struct{
-	envPOESSID string
-	League string
-	Filter string
+	POESSID string
+	League  string
+	Filter  string
 }
 
 
 type Client struct {
-	ItemID    chan []string
+	ItemStub    chan types.ItemStub
 	Conn      *websocket.Conn
 	Config Config
 	ServerURL string
@@ -37,7 +37,7 @@ type Client struct {
 func NewClient(ctx context.Context, cfg Config) *Client {
 	serverURL := getServerURL(cfg.League, cfg.Filter)
 	return &Client{
-		ItemID:        make(chan []string),
+		ItemStub:        make(chan types.ItemStub),
 		Conn:          nil,
 		Config:        cfg,
 		ServerURL:     serverURL,
@@ -51,10 +51,11 @@ func (client *Client) ReadMessage() {
 		for {
 			_, bytes, err := client.Conn.ReadMessage()
 
-			//if e, ok :=  err.(*websocket.CloseError); ok && e.Code == websocket.CloseAbnormalClosure {
-			//	logrus.Warn(err)
-			//	return
-			//}
+			if e, ok :=  err.(*websocket.CloseError); ok && e.Code == websocket.ClosePolicyViolation {
+				client.dcChan<-struct{}{}
+				logrus.Warn("error 1008, ggg server crashed")
+				return
+			}
 		//websocket: close 1006 (abnormal closure): unexpected EOF
 			if err != nil {
 				logrus.Error(errors.Wrap(err, "websocket read message error"))
@@ -68,7 +69,11 @@ func (client *Client) ReadMessage() {
 				logrus.Error("unmarshal json message from websocket server, ", err)
 				continue
 			}
-			client.ItemID <- itemID.New
+			stub:=types.ItemStub{
+				ID:     itemID.New,
+				Filter: client.Config.Filter,
+			}
+			client.ItemStub <- stub
 		}
 
 	}()

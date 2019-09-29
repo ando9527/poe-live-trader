@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ando9527/poe-live-trader/pkg/types"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -40,7 +41,7 @@ func FakeWebsocketServer() (server *httptest.Server) {
 func FakeNewWebsocketClient(serverURL string) (client *Client) {
 	newURL := "ws" + strings.TrimPrefix(serverURL, "http") + "/"
 	client = &Client{
-		ItemID: make(chan []string),
+		ItemStub: make(chan types.ItemStub),
 		ServerURL: newURL,
 		ctx: context.Background(),
 		}
@@ -52,11 +53,16 @@ func TestClient_GetItemID(t *testing.T) {
 	defer server.Close()
 
 	client := FakeNewWebsocketClient(server.URL)
-	expect := []string{"6bf0738f765b4d364fc65105910493c13b3d89ded2797cbcca32b99ca0579825"}
+	expect := types.ItemStub{
+		ID:     []string{"6bf0738f765b4d364fc65105910493c13b3d89ded2797cbcca32b99ca0579825"},
+		Filter: "",
+	}
+
+
 	client.Run()
 
 	select {
-	case actual := <-client.ItemID:
+	case actual := <-client.ItemStub:
 		logrus.Info("recv message, ", actual)
 		assert.Equal(t, expect, actual)
 		client.Disconnect()

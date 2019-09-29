@@ -10,10 +10,9 @@ import (
 	"time"
 
 	"github.com/ando9527/poe-live-trader/cmd/client/env"
-	"github.com/ando9527/poe-live-trader/pkg/audio"
 	"github.com/ando9527/poe-live-trader/pkg/log"
 	"github.com/ando9527/poe-live-trader/pkg/trader"
-	ws "github.com/ando9527/poe-live-trader/pkg/ws/client"
+	"github.com/ando9527/poe-live-trader/pkg/ws"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -68,8 +67,9 @@ func main() {
 	logrus.Infof("Poe Live Trader %s", version)
 
 	config:=		ws.Config{
-		League:      cfg.League,
-		Filter:      cfg.Filter,
+		POESSID: cfg.Poesessid,
+		League:  cfg.League,
+		Filter:  cfg.Filter,
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -78,29 +78,19 @@ func main() {
 
 	client.Launch()
 
-
-	whisper := client.Whisper
-
-	for {
-		select {
-		case result := <-whisper:
-			logrus.Info(result)
-			client.Mutex.Lock()
-			if client.IDCache[getName(result)]{
-				logrus.Debug("duplicated user in cache, ",getName(result))
-				continue
-			}
-			client.KeySim.Message<-result
-			client.IDCache[getName(result)]=true
-
+	for result:= range client.Whisper{
+		logrus.Info(result)
+		client.Mutex.Lock()
+		if client.IDCache[getName(result)]{
+			logrus.Debug("duplicated user in cache, ",getName(result))
 			client.Mutex.Unlock()
-			audio.Play("audio", cfg.Volume)
-			//if err != nil {
-			//	logrus.Warn("failed copy whisper to clipboard.")
-			//}
+			continue
 		}
-	}
+		client.KeySim.Message<-result
+		client.IDCache[getName(result)]=true
 
+		client.Mutex.Unlock()
+	}
 }
 
 func getName(template string)(n string){

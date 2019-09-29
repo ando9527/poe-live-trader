@@ -65,3 +65,9 @@ type ItemDetail struct {
 type ItemID struct {
 	New []string `json:"new"`
 }
+
+
+type ItemStub struct{
+	ID []string
+	Filter string
+}

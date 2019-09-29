@@ -12,12 +12,12 @@ import (
 )
 
 type Client struct {
-	GetHTTPServerURL func(itemID []string) (serverURL string)
+	GetHTTPServerURL func(stub types.ItemStub) (serverURL string)
 }
 
-func (client *Client) RequestItemDetail(itemID []string) (itemDetail types.ItemDetail) {
-	logrus.Debug("requesting data from http url")
-	url := client.GetHTTPServerURL(itemID)
+func (client *Client) RequestItemDetail(stub types.ItemStub) (itemDetail types.ItemDetail) {
+	logrus.Debug("Requesting data from http url")
+	url := client.GetHTTPServerURL(stub)
 	resp, err := http.Get(url)
 	if err != nil {
 		logrus.Panicf("Get item detail from url failed, url: %s", url)
@@ -35,10 +35,10 @@ func (client *Client) RequestItemDetail(itemID []string) (itemDetail types.ItemD
 	return itemDetail
 }
 
-func NewRequestClient(filter string) (client *Client) {
+func NewRequestClient() (client *Client) {
 	client = &Client{}
-	client.GetHTTPServerURL = func(itemID []string) (serverURL string) {
-		return fmt.Sprintf("https://www.pathofexile.com/api/trade/fetch/%s?query=%s", strings.Join(itemID, ","), filter)
+	client.GetHTTPServerURL = func(stub types.ItemStub) (serverURL string) {
+		return fmt.Sprintf("https://www.pathofexile.com/api/trade/fetch/%s?query=%s", strings.Join(stub.ID, ","), stub.Filter)
 	}
 	return client
 }
