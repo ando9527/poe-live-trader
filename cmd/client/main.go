@@ -80,19 +80,26 @@ func main() {
 
 	for result:= range client.Whisper{
 		logrus.Info(result)
+
+		if cfg.Ignored[getName(result)]{
+			logrus.Debug("User in ignored list, ", getName(result))
+			continue
+		}
+
 		client.Mutex.Lock()
-		if client.IDCache[getName(result)]{
-			logrus.Debug("duplicated user in cache, ",getName(result))
+		if client.IDCache[result]{
+			logrus.Debug("Duplicated user in cache, ",result)
 			client.Mutex.Unlock()
 			continue
 		}
 		client.KeySim.Message<-result
-		client.IDCache[getName(result)]=true
+		client.IDCache[result]=true
 
 		client.Mutex.Unlock()
 	}
 }
 
 func getName(template string)(n string){
-	return strings.Split(template, " ")[0]
+	tmp:=strings.Split(template, " ")[0]
+	return strings.Replace(tmp,"@", "", 1)
 }

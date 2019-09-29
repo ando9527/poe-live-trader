@@ -73,6 +73,17 @@ func (t *Trader) isPortInUsed()( ans bool){
 	return false
 }
 
+func (t *Trader) CacheClearTask(){
+	go func() {
+		for{
+			time.Sleep(time.Minute*10)
+			t.Mutex.Lock()
+			t.IDCache=make(map[string]bool)
+			t.Mutex.Unlock()
+		}
+	}()
+}
+
 func (t *Trader) Launch() {
 	if t.isPortInUsed(){
 		logrus.Panic("9527 port in used")
@@ -83,6 +94,7 @@ func (t *Trader) Launch() {
 	}
 	t.processItemID()
 	t.KeySim.Run()
+	t.CacheClearTask()
 
 }
 
