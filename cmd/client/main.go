@@ -86,18 +86,23 @@ func main() {
 			continue
 		}
 
+
+
+
 		client.Mutex.Lock()
-		if client.IDCache[result]{
-			logrus.Debug("Duplicated user in cache, ",result)
+		if client.IDCache[getName(result)]{
+			logrus.Debug("History duplicated user in cache, ",result)
 			client.Mutex.Unlock()
 			continue
 		}
 		client.KeySim.Message<-result
-		client.IDCache[result]=true
+		client.IDCache[getName(result)]=true
 
 		client.Mutex.Unlock()
 	}
 }
+
+
 
 func getName(template string)(n string){
 	tmp:=strings.Split(template, " ")[0]
