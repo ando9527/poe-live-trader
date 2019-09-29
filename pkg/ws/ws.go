@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -13,7 +14,6 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	log "github.com/sirupsen/logrus"
 )
 
 
@@ -33,16 +33,20 @@ type Client struct {
 	Conn      *websocket.Conn
 	Config Config
 	ServerURL string
+	dcChan chan struct{}
+	ctx context.Context
 
 }
 
-func NewClient(cfg Config) *Client {
+func NewClient(ctx context.Context, cfg Config) *Client {
 	serverURL := getServerURL(cfg.League, cfg.Filter)
 	return &Client{
 		ItemID:    make(chan []string),
 		Conn:      nil,
 		Config:    cfg,
 		ServerURL: serverURL,
+		dcChan:    make(chan struct{}),
+		ctx:       ctx,
 	}
 }
 func (client *Client) ReadMessage() {
@@ -51,41 +55,21 @@ func (client *Client) ReadMessage() {
 		for {
 			_, bytes, err := client.Conn.ReadMessage()
 
-			if e, ok :=  err.(*websocket.CloseError); ok && e.Code == websocket.CloseNormalClosure {
-				log.Info("WS close normal")
-				logrus.Exit(0)
-			}
-			//if e, ok :=  err.(*websocket.CloseError); ok && e.Code == websocket.CloseAbnormalClosure {
-			//	log.Warn(err)
-			//	return
-			//}
-
-			if err != nil {
-				log.Error(errors.Wrap(err, "websocket read message error"))
-				client.Conn.Close()
-				//log.Info("Disconnecting..")
-				//err := client.Conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-				//if err != nil {
-				//	log.Println("close ws: ", err)
-				//}
-				//logrus.Info("Reconnecting in 3 seconds..")
-				//time.Sleep(time.Second*3)
-				header := client.getHeader()
-				logrus.Infof("Connecting to %s", client.ServerURL)
-				dialer:=websocket.DefaultDialer
-				//dialer.HandshakeTimeout =90*time.Second
-				conn, _, err := dialer.Dial(client.ServerURL, header)
-				if err != nil {
-					logrus.Panic("dial:", err)
-				}
-				client.Conn= conn
+			if e, ok :=  err.(*websocket.CloseError); ok && e.Code == websocket.CloseAbnormalClosure {
+				logrus.Warn(err)
 				return
 			}
-			log.Debug("Receive: ", string(bytes))
+
+			if err != nil {
+				logrus.Error(errors.Wrap(err, "websocket read message error"))
+				client.dcChan<-struct{}{}
+				return
+			}
+			logrus.Debug("Receive: ", string(bytes))
 
 			err = json.Unmarshal(bytes, &itemID)
 			if err != nil {
-				logrus.Error(err)
+				logrus.Error("unmarshal json message from websocket server, ", err)
 				continue
 			}
 			client.ItemID <- itemID.New
@@ -94,20 +78,61 @@ func (client *Client) ReadMessage() {
 	}()
 }
 
-func (client *Client) Connect() {
-	header := client.getHeader()
+func (client *Client) Connect()(err error) {
+	header:= client.getHeader()
 	logrus.Infof("Connecting to %s", client.ServerURL)
 	dialer:=websocket.DefaultDialer
 	//dialer.HandshakeTimeout =90*time.Second
 	conn, _, err := dialer.Dial(client.ServerURL, header)
 	if err != nil {
-		logrus.Panic("dial:", err)
+		return errors.Wrapf(err, "Dial error")
 	}
-	log.Info("Connected websocket server!")
+	logrus.Info("Connected websocket server!")
 	client.Conn = conn
 	client.ReadMessage()
+	return nil
+
+}
 
 
+func (c *Client)MonitorStatus(){
+	go func(){
+		for{
+			select {
+				case <-c.dcChan:
+					for{
+						logrus.Info("reconnect in 5 sec..")
+
+						time.Sleep(time.Second*5)
+						err := c.Connect()
+						if err != nil {
+							logrus.Error(err)
+						}else{
+							break
+						}
+
+					}
+				case <-c.ctx.Done():
+					logrus.Println("interrupt, sending close signal to ws server")
+					err := c.Conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+					if err != nil {
+						logrus.Println("write close:", err)
+						return
+					}
+					return
+			}
+		}
+	}()
+
+}
+
+func (c *Client)Run()(err error){
+	err = c.Connect()
+	if err != nil {
+		return err
+	}
+	c.MonitorStatus()
+	return nil
 }
 
 
@@ -119,20 +144,24 @@ func getServerURL(league string, filter string) (serverUrl string) {
 
 
 func (c *Client)getHeader() (header http.Header) {
+	header = getSimChromeCookie()
+	logrus.Debug("using local poessid, ", os.Getenv("CLIENT_POESESSID"))
+	cookie := fmt.Sprintf("POESESSID=%s", os.Getenv("CLIENT_POESESSID"))
+	header.Add("Cookie", cookie)
+
+	return header
+}
+
+func getSimChromeCookie() (header http.Header) {
 	header = make(http.Header)
 	header.Add("Accept-Encoding", "gzip, deflate, br")
 	header.Add("Accept-Language", "en-US,en;q=0.9,zh-TW;q=0.8,zh;q=0.7,zh-CN;q=0.6,ja;q=0.5")
 	header.Add("Cache-Control", "no-cache")
 	header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36")
-	//header.Add("__cfduid","d8359ce94e004bd726a7d96bdd7ffeb011563189723")
-
-	logrus.Debug("using local poessid, ", os.Getenv("CLIENT_POESESSID"))
-	cookie := fmt.Sprintf("POESESSID=%s", os.Getenv("CLIENT_POESESSID"))
-	header.Add("Cookie", cookie)
-
-
 	return header
 }
+
+
 
 func (client *Client) NotifyDC() {
 	interrupt := make(chan os.Signal, 1)
@@ -142,19 +171,25 @@ func (client *Client) NotifyDC() {
 		for {
 			select {
 			case <-interrupt:
-				log.Println("interrupt, sending close signal to ws server")
+				logrus.Println("interrupt, sending close signal to ws server")
 
 				err := client.Conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 				if err != nil {
-					log.Println("write close:", err)
+					logrus.Println("write close:", err)
 					return
 				}
 				select {
-				case <-time.After(time.Second):
+					case <-time.After(time.Second):
 				}
 				return
 			}
 		}
 	}()
 
+}
+func (client *Client) Disconnect() {
+	err := client.Conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+	if err != nil {
+		logrus.Error("write close:", err)
+	}
 }

@@ -51,12 +51,15 @@ class Client extends WebSocket
 	OnError(Event)
 	{
 		SoundPlay, ./error.mp3
+		sleep, 1000
 		; MsgBox, Websocket Error
+		ExitApp
 	}
 
 	__Delete()
 	{
 		SoundPlay, ./error.mp3
+		sleep, 1000
 		; MsgBox, Exiting
 		ExitApp
 	}

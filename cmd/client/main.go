@@ -2,10 +2,12 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"fmt"
-	"net/http"
 	"os"
+	"os/signal"
 	"strings"
+	"time"
 
 	"github.com/ando9527/poe-live-trader/cmd/client/env"
 	"github.com/ando9527/poe-live-trader/pkg/audio"
@@ -15,7 +17,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	_ "net/http/pprof"
+	//_ "net/http/pprof"
 )
 
 var (
@@ -27,10 +29,27 @@ func pause() {
 	_, _ = bufio.NewReader(os.Stdin).ReadBytes('\n')
 }
 
-func main() {
+func NotifyDC(cancel context.CancelFunc) {
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt)
+
 	go func() {
-		logrus.Info(http.ListenAndServe("localhost:6060", nil))
+		for {
+			select {
+			case <-interrupt:
+				cancel()
+				time.Sleep(time.Second)
+				return
+			}
+		}
 	}()
+
+}
+
+func main() {
+	//go func() {
+	//	logrus.Info(http.ListenAndServe("localhost:6060", nil))
+	//}()
 	err := godotenv.Load("client.env")
 	if err != nil {
 		logrus.Error("Error loading client.env file")
@@ -56,7 +75,10 @@ func main() {
 		League:      cfg.League,
 		Filter:      cfg.Filter,
 	}
-	client := trader.NewTrader(config)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	NotifyDC(cancel)
+	client := trader.NewTrader(ctx, config)
 
 	client.Launch()
 

@@ -39,11 +39,16 @@ func NewServer()(s *Server) {
 	server := &Server{
 		Message: make(chan string),
 	}
-	//go func(){
-	//	if err := http.ListenAndServe(":9527", server); err != nil {
-	//		logrus.Fatal(err)
-	//	}
-	//}()
-
 	return server
+}
+
+func (s *Server)Run(){
+	go func(){
+		port:=":9527"
+		logrus.Debug("Local server listening port ", port)
+		if err := http.ListenAndServe(port , s); err != nil {
+			logrus.Panic(err)
+		}
+	}()
+
 }
