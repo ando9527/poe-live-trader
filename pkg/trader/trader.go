@@ -8,7 +8,7 @@ import (
 
 	"github.com/ando9527/poe-live-trader/pkg/key"
 	"github.com/ando9527/poe-live-trader/pkg/request"
-	"github.com/ando9527/poe-live-trader/pkg/ws"
+	ws "github.com/ando9527/poe-live-trader/pkg/ws/client"
 	"github.com/sirupsen/logrus"
 )
 

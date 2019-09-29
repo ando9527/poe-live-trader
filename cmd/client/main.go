@@ -13,7 +13,7 @@ import (
 	"github.com/ando9527/poe-live-trader/pkg/audio"
 	"github.com/ando9527/poe-live-trader/pkg/log"
 	"github.com/ando9527/poe-live-trader/pkg/trader"
-	"github.com/ando9527/poe-live-trader/pkg/ws"
+	ws "github.com/ando9527/poe-live-trader/pkg/ws/client"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
