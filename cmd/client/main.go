@@ -94,10 +94,11 @@ func main() {
 				logrus.Debug("duplicated user in cache, ",getName(result))
 				continue
 			}
-			client.LocalServer.Message<-result
+			client.KeySim.Message<-result
 			client.IDCache[getName(result)]=true
+
 			client.Mutex.Unlock()
-			audio.Play(cfg.Volume)
+			audio.Play("audio", cfg.Volume)
 			//if err != nil {
 			//	logrus.Warn("failed copy whisper to clipboard.")
 			//}

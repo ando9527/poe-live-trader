@@ -1,6 +1,7 @@
 package audio
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -12,8 +13,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Play(volume float64) {
-	f, err := os.Open("audio.wav")
+func Play(name string, volume float64) {
+	f, err := os.Open(fmt.Sprintf("%s.wav", name))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,3 +45,5 @@ func Play(volume float64) {
 
 	<-done
 }
+
+

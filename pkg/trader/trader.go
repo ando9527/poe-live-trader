@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/ando9527/poe-live-trader/pkg/key"
 	"github.com/ando9527/poe-live-trader/pkg/request"
 	"github.com/ando9527/poe-live-trader/pkg/ws"
-	"github.com/ando9527/poe-live-trader/pkg/ws/server"
 	"github.com/sirupsen/logrus"
 )
 
@@ -16,7 +16,7 @@ type Trader struct {
 	Whisper         chan string
 	WebsocketClient *ws.Client
 	RequestClient   *request.Client
-	LocalServer *server.Server
+	KeySim *key.Client
 	IDCache map[string]bool
 	sync.Mutex
 	ctx context.Context
@@ -25,10 +25,11 @@ type Trader struct {
 func NewTrader(ctx context.Context, wsConfig ws.Config) (t *Trader) {
 	t = &Trader{
 		Whisper:         make(chan string),
-		WebsocketClient: ws.NewClient( ctx,wsConfig),
+		WebsocketClient: ws.NewClient(ctx, wsConfig),
 		RequestClient:   request.NewRequestClient(wsConfig.Filter),
-		LocalServer:     server.NewServer(ctx),
+		KeySim:          key.NewClient(ctx),
 		IDCache:         map[string]bool{},
+		Mutex:           sync.Mutex{},
 		ctx:             ctx,
 	}
 	//go func(){
@@ -81,7 +82,7 @@ func (t *Trader) Launch() {
 		logrus.Panic(err)
 	}
 	t.processItemID()
-	t.LocalServer.Run()
+	t.KeySim.Run()
 
 }
 
