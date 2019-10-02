@@ -40,10 +40,15 @@ func Play(name string, volume float64) {
 	speedy := beep.ResampleRatio(4, 1, v)
 	//speaker.Play(speedy)
 	done := make(chan bool)
-	speaker.Play(beep.Seq(speedy, beep.Callback(func() {
-		done <- true
-	})))
+	go func(){
+		speaker.Play(beep.Seq(speedy, beep.Callback(func() {
+			//done <- true
+		})))
+	}()
 
+	time.AfterFunc(time.Second, func(){
+		done<-true
+	})
 	<-done
 }
 

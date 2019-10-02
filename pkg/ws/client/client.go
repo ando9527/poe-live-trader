@@ -139,7 +139,7 @@ func (c *Client)Run()(err error){
 
 func getServerURL(league string, filter string) (serverUrl string) {
 	urlPath := fmt.Sprintf("/api/trade/live/%s/%s", league, filter)
-	u := url.URL{Scheme: "ws", Host: "www.pathofexile.com", Path: urlPath}
+	u := url.URL{Scheme: "wss", Host: "www.pathofexile.com", Path: urlPath}
 	return u.String()
 }
 

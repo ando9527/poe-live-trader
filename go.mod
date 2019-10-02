@@ -1,6 +1,7 @@
 module github.com/ando9527/poe-live-trader
 
 require (
+	github.com/briandowns/spinner v1.7.0
 	github.com/faiface/beep v1.0.1
 	github.com/go-vgo/robotgo v0.0.0-20190926173521-f981187a7aea
 	github.com/gorilla/websocket v1.4.1

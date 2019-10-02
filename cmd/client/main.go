@@ -13,6 +13,7 @@ import (
 	"github.com/ando9527/poe-live-trader/pkg/log"
 	"github.com/ando9527/poe-live-trader/pkg/trader"
 	"github.com/ando9527/poe-live-trader/pkg/ws"
+	"github.com/briandowns/spinner"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -77,12 +78,13 @@ func main() {
 	client := trader.NewTrader(ctx, config)
 
 	client.Launch()
+	spinnerAnimation(ctx)
 
 	for result:= range client.Whisper{
 		logrus.Info(result)
 
 		if cfg.Ignored[getName(result)]{
-			logrus.Debug("User in ignored list, ", getName(result))
+			logrus.Info("User in ignored list, ", getName(result))
 			continue
 		}
 
@@ -91,7 +93,7 @@ func main() {
 
 		client.Mutex.Lock()
 		if client.IDCache[getName(result)]{
-			logrus.Debug("History duplicated user in cache, ",result)
+			logrus.Info("History duplicated user in cache, ",result)
 			client.Mutex.Unlock()
 			continue
 		}
@@ -107,4 +109,18 @@ func main() {
 func getName(template string)(n string){
 	tmp:=strings.Split(template, " ")[0]
 	return strings.Replace(tmp,"@", "", 1)
+}
+
+func spinnerAnimation(ctx context.Context){
+	go func(){
+		s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
+		s.Start()
+		for{
+			select {
+				case <-ctx.Done():
+				s.Stop()
+				return
+			}
+		}
+	}()
 }
