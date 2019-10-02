@@ -14,7 +14,7 @@ func InitLogger(level string) {
 	// Setup logger format
 	l, err := logrus.ParseLevel(level)
 	logrus.SetFormatter(&logrus.TextFormatter{
-		ForceColors:     true,
+		ForceColors:     false,
 		FullTimestamp:   true,
 		TimestampFormat: time.RFC822,
 	})

@@ -17,7 +17,7 @@ debug.env
 admin.env
 client.env
 cloud.env
-
+logrus.log
 # Build folder
 /build
 
