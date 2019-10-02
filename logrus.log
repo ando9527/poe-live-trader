@@ -1,0 +1,16 @@
+[36mINFO[0m[03 Oct 19 01:14 CST] Poe Live Trader v0.2.0-50-g69c1b7a           
+[37mDEBU[0m[03 Oct 19 01:14 CST] testing port in useddial tcp 127.0.0.1:9527: i/o timeout 
+[37mDEBU[0m[03 Oct 19 01:14 CST] using local poessid, 031c3f920cbe9af4792e45b8620b1df7 
+[36mINFO[0m[03 Oct 19 01:14 CST] Connecting to wss://www.pathofexile.com/api/trade/live/Blight/vLDm7WfE 
+[36mINFO[0m[03 Oct 19 01:14 CST] Connected websocket server!                  
+[37mDEBU[0m[03 Oct 19 01:18 CST] Interrupt keyboard simulator                 
+[36mINFO[0m[03 Oct 19 01:18 CST] interrupt, sending close signal to ws server 
+[31mERRO[0m[03 Oct 19 01:18 CST] websocket read message error: websocket: close 1000 (normal) 
+[36mINFO[0m[03 Oct 19 01:18 CST] Poe Live Trader v0.2.0-50-g69c1b7a           
+[37mDEBU[0m[03 Oct 19 01:18 CST] testing port in useddial tcp 127.0.0.1:9527: i/o timeout 
+[37mDEBU[0m[03 Oct 19 01:18 CST] using local poessid, 031c3f920cbe9af4792e45b8620b1df7 
+[36mINFO[0m[03 Oct 19 01:18 CST] Connecting to wss://www.pathofexile.com/api/trade/live/Blight/vLDm7WfE 
+[36mINFO[0m[03 Oct 19 01:18 CST] Connected websocket server!                  
+[36mINFO[0m[03 Oct 19 01:18 CST] interrupt, sending close signal to ws server 
+[37mDEBU[0m[03 Oct 19 01:18 CST] Interrupt keyboard simulator                 
+[31mERRO[0m[03 Oct 19 01:18 CST] websocket read message error: websocket: close 1000 (normal) 

@@ -1,6 +1,8 @@
 package log
 
 import (
+	"fmt"
+	"io"
 	"os"
 	"time"
 
@@ -21,6 +23,13 @@ func InitLogger(level string) {
 		os.Exit(1)
 	}
 	logrus.SetLevel(l)
+
+	f, err := os.OpenFile("logrus.log", os.O_APPEND | os.O_CREATE | os.O_RDWR, 0666)
+	if err != nil {
+		fmt.Printf("error opening file: %v", err)
+	}
+	mw := io.MultiWriter(os.Stdout, f)
+	logrus.SetOutput(mw)
 }
 
 func InitCloudLogger(level string) {

@@ -81,6 +81,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/robotn/gohook v0.0.0-20190905174353-5bea7a10cc3a h1:mO88NwjGgGRLCo5HuXqjewR/m294XJ0OcyqRmhtl2d4=
 github.com/robotn/gohook v0.0.0-20190905174353-5bea7a10cc3a/go.mod h1:YD5RyCnUEY2xqtkkgeQVZ31UAfAnVPwUxpTE5cwSXg4=
+github.com/robotn/gohook v0.0.0-20190927170941-221bcb399156 h1:BfDOyt2THC9WRCBJMKIH89Xl4ZLTlAjmPotZCxX4v/4=
+github.com/robotn/gohook v0.0.0-20190927170941-221bcb399156/go.mod h1:YD5RyCnUEY2xqtkkgeQVZ31UAfAnVPwUxpTE5cwSXg4=
 github.com/robotn/xgb v0.0.0-20190912153532-2cb92d044934 h1:2lhSR8N3T6I30q096DT7/5AKEIcf1vvnnWAmS0wfnNY=
 github.com/robotn/xgb v0.0.0-20190912153532-2cb92d044934/go.mod h1:SxQhJskUJ4rleVU44YvnrdvxQr0tKy5SRSigBrCgyyQ=
 github.com/robotn/xgbutil v0.0.0-20190912154524-c861d6f87770 h1:2uX8QRLkkxn2EpAQ6I3KhA79BkdRZfvugJUzJadiJwk=
