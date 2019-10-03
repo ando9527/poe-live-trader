@@ -63,8 +63,9 @@ func main() {
 	}
 
 
-	log.InitLogger(cfg.LogLevel, cfg.Logging)
+	log.InitLogger(cfg.LogLevel, true)
 	logrus.Infof("Poe Live Trader %s", version)
+	logrus.Debug("Debug mode on")
 
 	config:=		ws.Config{
 		POESSID: cfg.Poesessid,

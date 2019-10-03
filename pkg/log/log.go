@@ -35,7 +35,7 @@ func InitLogger(level string, logging bool) {
 		MaxSize:    50, // megabytes
 		MaxBackups: 3,
 		MaxAge:     28, //days
-		Level:      logrus.DebugLevel,
+		Level:      logLevel,
 		Formatter: &logrus.JSONFormatter{
 			TimestampFormat: time.RFC822,
 		},
