@@ -12,7 +12,6 @@ import (
 
 	"github.com/ando9527/poe-live-trader/pkg/types"
 	"github.com/gorilla/websocket"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -50,15 +49,16 @@ func (client *Client) ReadMessage() {
 		itemID := types.ItemID{}
 		for {
 			_, bytes, err := client.Conn.ReadMessage()
-
 			if e, ok :=  err.(*websocket.CloseError); ok && e.Code == websocket.ClosePolicyViolation {
 				client.dcChan<-struct{}{}
 				logrus.Warn("error 1008, ggg server crashed")
 				return
 			}
+
+
 		//websocket: close 1006 (abnormal closure): unexpected EOF
 			if err != nil {
-				logrus.Error(errors.Wrap(err, "websocket read message error"))
+				logrus.Error("Websocket read message error, ", err)
 				client.dcChan<-struct{}{}
 				return
 			}
@@ -66,7 +66,7 @@ func (client *Client) ReadMessage() {
 
 			err = json.Unmarshal(bytes, &itemID)
 			if err != nil {
-				logrus.Error("unmarshal json message from websocket server, ", err)
+				logrus.Error("Unmarshal json message from websocket server, ", err)
 				continue
 			}
 			stub:=types.ItemStub{
@@ -86,7 +86,7 @@ func (client *Client) Connect()(err error) {
 	//dialer.HandshakeTimeout =90*time.Second
 	conn, _, err := dialer.Dial(client.ServerURL, header)
 	if err != nil {
-		return errors.Wrapf(err, "Dial error")
+		return fmt.Errorf("dial error, %w", err)
 	}
 	logrus.Info("Connected websocket server!")
 	client.Conn = conn
@@ -117,7 +117,7 @@ func (c *Client)MonitorStatus(){
 					logrus.Println("interrupt, sending close signal to ws server")
 					err := c.Conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 					if err != nil {
-						logrus.Println("write close:", err)
+						logrus.Info("write close:", err)
 						return
 					}
 					return

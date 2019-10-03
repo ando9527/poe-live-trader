@@ -1,0 +1,3 @@
+{"level":"info","msg":"interrupt, sending close signal to ws server","time":"03 Oct 19 01:30 CST"}
+{"level":"debug","msg":"Interrupt keyboard simulator","time":"03 Oct 19 01:30 CST"}
+{"level":"error","msg":"websocket read message error: websocket: close 1000 (normal)","time":"03 Oct 19 01:30 CST"}
