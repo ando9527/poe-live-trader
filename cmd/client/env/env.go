@@ -12,7 +12,6 @@ type Env struct {
 	Poesessid   string  `required:"true" split_words:"true"`
 	Filter      []string  `required:"true" split_words:"true"`
 	Volume      float64 `required:"true" split_words:"true"`
-	Ignored 	map[string]bool `required:"true" split_words:"true"`
 }
 
 func NewEnv()(cfg Env, err error)  {

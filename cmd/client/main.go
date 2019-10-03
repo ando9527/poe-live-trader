@@ -78,13 +78,10 @@ func main() {
 	for result:= range client.Whisper{
 		logrus.Info(result)
 
-		if cfg.Ignored[getName(result)]{
+		if client.Ignored[getName(result)]{
 			logrus.Info("User in ignored list, ", getName(result))
 			continue
 		}
-
-
-
 
 		client.Mutex.Lock()
 		if client.IDCache[getName(result)]{
