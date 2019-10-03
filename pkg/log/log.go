@@ -10,12 +10,24 @@ import (
 	"github.com/snowzach/rotatefilehook"
 )
 
-func InitLogger(level string) {
+func InitLogger(level string, logging bool) {
 	// Setup logger format
 	logLevel, err := logrus.ParseLevel(level)
 	if err != nil {
-		logrus.Panic(err.Error())
+		logrus.Panic(err)
 		os.Exit(1)
+	}
+
+	logrus.SetLevel(logLevel)
+	logrus.SetOutput(colorable.NewColorableStdout())
+	logrus.SetFormatter(&logrus.TextFormatter{
+		ForceColors:     true,
+		FullTimestamp:   true,
+		TimestampFormat: time.RFC822,
+	})
+
+	if !logging{
+		return
 	}
 
 	rotateFileHook, err := rotatefilehook.NewRotateFileHook(rotatefilehook.RotateFileConfig{
@@ -23,7 +35,7 @@ func InitLogger(level string) {
 		MaxSize:    50, // megabytes
 		MaxBackups: 3,
 		MaxAge:     28, //days
-		Level:      logLevel,
+		Level:      logrus.DebugLevel,
 		Formatter: &logrus.JSONFormatter{
 			TimestampFormat: time.RFC822,
 		},
@@ -32,13 +44,7 @@ func InitLogger(level string) {
 	if err != nil {
 		logrus.Fatalf("Failed to initialize file rotate hook: %v", err)
 	}
-	logrus.SetLevel(logLevel)
-	logrus.SetOutput(colorable.NewColorableStdout())
-	logrus.SetFormatter(&logrus.TextFormatter{
-		ForceColors:     true,
-		FullTimestamp:   true,
-		TimestampFormat: time.RFC822,
-	})
+
 	logrus.AddHook(rotateFileHook)
 
 }

@@ -1,3 +1,5 @@
-{"level":"info","msg":"interrupt, sending close signal to ws server","time":"03 Oct 19 01:30 CST"}
-{"level":"debug","msg":"Interrupt keyboard simulator","time":"03 Oct 19 01:30 CST"}
-{"level":"error","msg":"websocket read message error: websocket: close 1000 (normal)","time":"03 Oct 19 01:30 CST"}
+{"level":"info","msg":"Poe Live Trader v0.2.0-54-gfae5895","time":"03 Oct 19 08:20 CST"}
+{"level":"debug","msg":"testing port in useddial tcp 127.0.0.1:9527: i/o timeout","time":"03 Oct 19 08:20 CST"}
+{"level":"debug","msg":"using local poessid, 031c3f920cbe9af4792e45b8620b1df7","time":"03 Oct 19 08:20 CST"}
+{"level":"info","msg":"Connecting to wss://www.pathofexile.com/api/trade/live/Blight/vLDm7WfE","time":"03 Oct 19 08:20 CST"}
+{"level":"info","msg":"Connected websocket server!","time":"03 Oct 19 08:20 CST"}

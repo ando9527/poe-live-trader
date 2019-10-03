@@ -63,7 +63,7 @@ func main() {
 	}
 
 
-	log.InitLogger(cfg.LogLevel)
+	log.InitLogger(cfg.LogLevel, cfg.Logging)
 	logrus.Infof("Poe Live Trader %s", version)
 
 	config:=		ws.Config{
