@@ -15,7 +15,6 @@ import (
 	"github.com/ando9527/poe-live-trader/pkg/ws"
 	"github.com/briandowns/spinner"
 	"github.com/joho/godotenv"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	//_ "net/http/pprof"
 )
@@ -58,14 +57,15 @@ func main() {
 	}
 	cfg, err:= env.NewEnv()
 	if err != nil {
-		logrus.Error(errors.Wrap(err, "Please setup .env file properly"))
+		logrus.Error("Please setup .env file properly, ", err)
 		pause()
 		return
 	}
 
 
-	log.InitLogger(cfg.LogLevel)
+	log.InitLogger(cfg.LogLevel, true)
 	logrus.Infof("Poe Live Trader %s", version)
+	logrus.Debug("Debug mode on")
 
 	config:=		ws.Config{
 		POESSID: cfg.Poesessid,

@@ -5,22 +5,48 @@ import (
 	"time"
 
 	"github.com/joonix/log"
+	"github.com/mattn/go-colorable"
 	"github.com/sirupsen/logrus"
+	"github.com/snowzach/rotatefilehook"
 )
 
-func InitLogger(level string) {
+func InitLogger(level string, logging bool) {
 	// Setup logger format
-	l, err := logrus.ParseLevel(level)
+	logLevel, err := logrus.ParseLevel(level)
+	if err != nil {
+		logrus.Panic(err)
+		os.Exit(1)
+	}
+
+	logrus.SetLevel(logLevel)
+	logrus.SetOutput(colorable.NewColorableStdout())
 	logrus.SetFormatter(&logrus.TextFormatter{
 		ForceColors:     true,
 		FullTimestamp:   true,
 		TimestampFormat: time.RFC822,
 	})
-	if err != nil {
-		logrus.Panic(err.Error())
-		os.Exit(1)
+
+	if !logging{
+		return
 	}
-	logrus.SetLevel(l)
+
+	rotateFileHook, err := rotatefilehook.NewRotateFileHook(rotatefilehook.RotateFileConfig{
+		Filename:   "logrus.log",
+		MaxSize:    50, // megabytes
+		MaxBackups: 3,
+		MaxAge:     28, //days
+		Level:      logLevel,
+		Formatter: &logrus.JSONFormatter{
+			TimestampFormat: time.RFC822,
+		},
+	})
+
+	if err != nil {
+		logrus.Fatalf("Failed to initialize file rotate hook: %v", err)
+	}
+
+	logrus.AddHook(rotateFileHook)
+
 }
 
 func InitCloudLogger(level string) {
