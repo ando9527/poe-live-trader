@@ -3,6 +3,7 @@ package ignored
 import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"github.com/sirupsen/logrus"
 )
 type Ignored struct {
 	ID   int64
@@ -46,8 +47,17 @@ func (c *Client)Add(name string) (err error){
 }
 
 func (c *Client)Remove(name string)(err error){
-	err = c.DB.Where("age = ?", name).Error
-	return err
+	ig:=&Ignored{}
+	err = c.DB.Where("name = ?", name).Delete(ig).Error
+	if err != nil {
+		return err
+	}
+
+	if ig.Name==""{
+		logrus.Warnf("%s not exist", name)
+	}
+
+	return nil
 }
 
 func (c *Client)GetAll()(users []Ignored, err error){

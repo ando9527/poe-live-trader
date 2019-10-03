@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"reflect"
 	"strings"
 
 	"github.com/ando9527/poe-live-trader/pkg/db/ignored"
@@ -19,7 +18,7 @@ func main(){
 		fmt.Println("2. Remove user from ignored list.")
 		fmt.Println("3. Display ignored list.")
 		fmt.Println("4. Quit.")
-		fmt.Printf("What you choice?(1)")
+		fmt.Print("What you choice?(1)")
 		s, e := getInput()
 		fmt.Println(s)
 		if e != nil {
@@ -27,7 +26,7 @@ func main(){
 			continue
 		}
 		if s=="2"{
-			fmt.Println("Removing User Name?")
+			fmt.Print("Removing User Name?")
 			n, e := getInput()
 			if e != nil {
 				logrus.Error( e)
@@ -46,9 +45,12 @@ func main(){
 				logrus.Error("Failed to get list, ",e)
 				continue
 			}
+			fmt.Println("==========================")
+			fmt.Println("Ignored List: ")
 			for _,v:=range users{
-				fmt.Println(v)
+				fmt.Println(v.Name)
 			}
+			fmt.Println("==========================")
 			continue
 		}else if s =="4"{
 			os.Exit(0)
@@ -79,8 +81,8 @@ func getInput()(s string, e error){
 		return "",e
 	}
 	s=strings.Replace(text,"\n","", -1)
+	s=strings.Replace(s,"\r","", -1)
 	s=strings.Replace(s," ","", -1)
-	fmt.Println(s=="4")
-	fmt.Println(reflect.TypeOf(s))
+	s=strings.Replace(s,"@","", -1)
 	return s, e
 }
