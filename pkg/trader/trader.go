@@ -75,8 +75,8 @@ func (t *Trader) isPortInUsed()( ans bool){
 
 func (t *Trader) CacheClearTask(){
 	go func() {
-		for{
-			time.Sleep(time.Minute*10)
+		ticker:=time.NewTicker(time.Minute*10)
+		for _= range ticker.C{
 			t.Mutex.Lock()
 			t.IDCache=make(map[string]bool)
 			t.Mutex.Unlock()

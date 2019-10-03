@@ -101,10 +101,9 @@ func (c *Client)MonitorStatus(){
 		for{
 			select {
 				case <-c.dcChan:
-					for{
-						logrus.Info("reconnect in 5 sec..")
-
-						time.Sleep(time.Second*5)
+					ticker:=time.NewTicker(time.Second*6)
+					for _=range ticker.C{
+						logrus.Info("reconnect in 6 sec..")
 						err := c.Connect()
 						if err != nil {
 							logrus.Error(err)
