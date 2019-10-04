@@ -126,6 +126,15 @@ func (t *Trader) Launch() {
 	t.processItemID()
 	t.KeySim.Run()
 	t.CacheClearTask()
+	err = t.IgnoredClient.Connect("sqlite.db")
+	if err != nil {
+		panic(err)
+	}
+	err = t.IgnoredClient.Migration()
+	if err != nil {
+		panic(err)
+	}
+
 	t.initIgnoredList()
 	t.UpdateIgnoredTask()
 

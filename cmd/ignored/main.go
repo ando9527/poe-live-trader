@@ -12,6 +12,15 @@ import (
 
 func main(){
 	c:=ignored.NewClient()
+	e := c.Connect("sqlite.db")
+	if e != nil {
+		panic(e)
+	}
+	e = c.Migration()
+	if e != nil {
+		panic(e)
+	}
+
 	for{
 
 		fmt.Println("1. Add user into ignored list.")

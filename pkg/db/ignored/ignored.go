@@ -10,20 +10,27 @@ type Ignored struct {
 	Name string
 }
 type Client struct{
-	DB *gorm.DB
+	db *gorm.DB
 }
 
-func NewClient()( c *Client){
+func NewClient()(c *Client){
+	return &Client{
+		db: nil,
+	}
+}
 
-	db, err := gorm.Open("sqlite3", "sqlite.db")
+func (c *Client)Connect(name string) (e error) {
+
+	db, err := gorm.Open("sqlite3", name)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	c= &Client{
-		DB: db,
-	}
-	c.DB.AutoMigrate(&Ignored{})
-	return c
+	c.db =db
+	return nil
+}
+
+func (c *Client)Migration() (e error){
+	return c.db.AutoMigrate(&Ignored{}).Error
 }
 
 func (c *Client)GetIgnoreMap()(m map[string]bool,err error){
@@ -40,7 +47,7 @@ func (c *Client)GetIgnoreMap()(m map[string]bool,err error){
 }
 
 func (c *Client)Add(name string) (err error){
-	 err = c.DB.Create(&Ignored{
+	 err = c.db.Create(&Ignored{
 		Name: name,
 	}).Error
 	return err
@@ -48,7 +55,7 @@ func (c *Client)Add(name string) (err error){
 
 func (c *Client)Remove(name string)(err error){
 	ig:=&Ignored{}
-	err = c.DB.Where("name = ?", name).Delete(ig).Error
+	err = c.db.Where("name = ?", name).Delete(ig).Error
 	if err != nil {
 		return err
 	}
@@ -62,6 +69,6 @@ func (c *Client)Remove(name string)(err error){
 
 func (c *Client)GetAll()(users []Ignored, err error){
 	users=[]Ignored{}
-	err= c.DB.Find(&users).Error
+	err= c.db.Find(&users).Error
 	return users, err
 }
