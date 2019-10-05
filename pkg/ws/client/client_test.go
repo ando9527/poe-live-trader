@@ -29,9 +29,8 @@ func FakeWebsocketServer() (server *httptest.Server) {
 			if err != nil {
 				logrus.Error(err)
 			}
-			time.Sleep(10 * time.Millisecond)
+			time.Sleep(time.Second)
 		}
-
 	}
 	handler := http.HandlerFunc(f)
 	server = httptest.NewServer(handler)
@@ -58,20 +57,23 @@ func TestClient_GetItemID(t *testing.T) {
 		Filter: "",
 	}
 
+	go func(){
+		select {
+		case actual := <-client.ItemStub:
+			logrus.Info("recv message, ", actual)
+			assert.Equal(t, expect, actual)
+			client.Disconnect()
+			client.Conn.Close()
 
-	client.Run()
-
-	select {
-	case actual := <-client.ItemStub:
-		logrus.Info("recv message, ", actual)
-		assert.Equal(t, expect, actual)
-		client.Disconnect()
-		client.Conn.Close()
-
-		time.Sleep(10 * time.Millisecond)
-		return
-	case <-time.After(time.Millisecond * 60):
-		t.Error(errors.New("timeout"))
+			time.Sleep(10 * time.Millisecond)
+			return
+		case <-time.After(time.Millisecond * 60):
+			t.Error(errors.New("timeout"))
+		}
+	}()
+	err := client.Run()
+	if err != nil {
+		t.Fatal(err)
 	}
 
 }
