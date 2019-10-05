@@ -10,6 +10,7 @@ require (
 	github.com/joonix/log v0.0.0-20190524090622-13fe31bbdd7a
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kr/pretty v0.1.0 // indirect
+	github.com/matryer/is v1.2.0
 	github.com/mattn/go-colorable v0.1.2
 	github.com/pkg/errors v0.8.1
 	github.com/robotn/gohook v0.0.0-20190927170941-221bcb399156 // indirect

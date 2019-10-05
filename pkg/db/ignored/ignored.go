@@ -3,12 +3,12 @@ package ignored
 import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"github.com/sirupsen/logrus"
 )
 type Ignored struct {
 	ID   int64
 	Name string
 }
+
 type Client struct{
 	db *gorm.DB
 }
@@ -54,14 +54,9 @@ func (c *Client)Add(name string) (err error){
 }
 
 func (c *Client)Remove(name string)(err error){
-	ig:=&Ignored{}
-	err = c.db.Where("name = ?", name).Delete(ig).Error
+	err = c.db.Where("name = ?", name).Delete(Ignored{}).Error
 	if err != nil {
 		return err
-	}
-
-	if ig.Name==""{
-		logrus.Warnf("%s not exist", name)
 	}
 
 	return nil
