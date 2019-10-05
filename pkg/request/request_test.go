@@ -35,7 +35,10 @@ func TestClient_RequestItemDetail(t *testing.T) {
 	server := NewFakeRequestServer()
 	defer server.Close()
 	client := NewFakeRequestClient(server.URL)
-	actual := client.RequestItemDetail([]string{"6bf0738f765b4d364fc65105910493c13b3d89ded2797cbcca32b99ca0579825"})
+	actual := client.RequestItemDetail(types.ItemStub{
+		ID:     []string{"6bf0738f765b4d364fc65105910493c13b3d89ded2797cbcca32b99ca0579825"},
+		Filter: "",
+	})
 	expect := expectResult()
 	assert.Equal(t, expect, actual)
 

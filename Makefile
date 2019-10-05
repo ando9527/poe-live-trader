@@ -27,7 +27,7 @@ build: mkdir-build cp-audio
 	$(GOBUILD) -o build/${PROJECT}.exe -ldflags "-X main.version=${VERSION}" cmd/client/main.go
 
 test:
-	$(GOTEST) -v ./...
+	$(GOTEST)  ./...
 clean:
 		rm -rf ./build
 
