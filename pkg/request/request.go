@@ -15,7 +15,7 @@ type Client struct {
 	GetHTTPServerURL func(stub types.ItemStub) (serverURL string)
 }
 
-func (client *Client) RequestItemDetail(stub types.ItemStub) (itemDetail types.ItemDetail) {
+func (client *Client) RequestItemDetail(stub types.ItemStub) (itemDetail types.ItemDetail, err error) {
 	logrus.Debug("Requesting data from http url")
 	url := client.GetHTTPServerURL(stub)
 	resp, err := http.Get(url)
@@ -30,9 +30,10 @@ func (client *Client) RequestItemDetail(stub types.ItemStub) (itemDetail types.I
 	err = json.NewDecoder(resp.Body).Decode(&itemDetail)
 
 	if err != nil {
-		logrus.Panicf("failed to decode json of item detail, url: %s", url)
+		logrus.Error("failed to decode json of item detail, ", url)
+		return itemDetail, fmt.Errorf("failed to decode json of item detail, %s", url)
 	}
-	return itemDetail
+	return itemDetail, nil
 }
 
 func NewRequestClient() (client *Client) {

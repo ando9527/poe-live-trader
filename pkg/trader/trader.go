@@ -65,7 +65,11 @@ func (t *Trader) processItemID() {
 			case result := <-t.WebsocketPool.ItemStubChan:
 				// get detail of item from http server
 				go func() {
-					itemDetail := t.RequestClient.RequestItemDetail(result)
+					itemDetail ,err:= t.RequestClient.RequestItemDetail(result)
+					if err != nil {
+						logrus.Error(err)
+						return
+					}
 					for _, result := range itemDetail.Result {
 						t.Whisper <- result.Listing.Whisper
 					}
