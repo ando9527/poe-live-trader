@@ -3,29 +3,13 @@ This is the tool similar to live search in web.
 We will do this in game.
  
 ##  How To
-###  Setup cookie
-1. Brows https://www.pathofexile.com/trade/search/
-2. Press F12
-3. Get the cookie, value of POESESSID
-4. Fill in .env
+1. Install Mingw64 lib https://sourceforge.net/projects/mingw-w64/
+2. Client.env is setting file.
+3. Setup CLIENT_POESSID https://www.pathofexile.com/forum/view-thread/1989935/page/9#p14857124
+4. Setup CLIENT_FILTER=ID_HERE  from https://www.pathofexile.com/trade/search/Blight/ID_HERE
+5. F2 to continue/pause the process.
 
-### Setup Filter
-1. Search the item in 
-2. Get the filter string "8GvyvVFV" in https://www.pathofexile.com/trade/search/Legion/8GvyvVFV
-3. Fill in .env
-
-### Graphql Query
-```graphql
-query  {
-  ssid {
-    Content
-  }
-}
-
-
-mutation {
-  createOrUpdateSSID(input: { Content: "123456789" }) {
-    Content
-  }
-}
-```
+## Other setting
+1. Multiple items search(CLIENT_FILTER=xxxxxx,yyyyyy,zzzzzz)
+2. User ignored.exe to ignore user
+3. Add Mingw64 into [environment variable]( http://www.mathcancer.org/blog/adding-path-to-windows/)
