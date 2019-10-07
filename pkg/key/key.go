@@ -37,15 +37,16 @@ func (c *Client) Run(){
 						continue
 					}
 					logrus.Debug("Auto inserting!")
-					cmd := exec.Command("./ahk/insert.exe", m)
-					e := cmd.Run()
-					if e != nil {
-						logrus.Error("ahk insert failed, " ,e)
-					}
-					e = clipboard.WriteAll(m)
+					e := clipboard.WriteAll(m)
 					if e != nil {
 						logrus.Error("Copy to clipboard", m)
 					}
+					cmd := exec.Command("./ahk/insert.exe", m)
+					e = cmd.Run()
+					if e != nil {
+						logrus.Error("ahk insert failed, " ,e)
+					}
+
 					audio.Play("audio", -5)
 
 				case <-c.ctx.Done():
