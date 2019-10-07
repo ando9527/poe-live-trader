@@ -29,21 +29,20 @@ func FakeWebsocketServer() (server *httptest.Server) {
 			if err != nil {
 				logrus.Error(err)
 			}
-			time.Sleep(10 * time.Millisecond)
+			time.Sleep(time.Second)
 		}
-
 	}
 	handler := http.HandlerFunc(f)
 	server = httptest.NewServer(handler)
 	return server
 }
 
-func FakeNewWebsocketClient(serverURL string) (client *Client) {
+func FakeNewWebsocketClient(ctx context.Context, serverURL string) (client *Client) {
 	newURL := "ws" + strings.TrimPrefix(serverURL, "http") + "/"
 	client = &Client{
 		ItemStub: make(chan types.ItemStub),
 		ServerURL: newURL,
-		ctx: context.Background(),
+		ctx: ctx,
 		}
 	return client
 }
@@ -51,27 +50,31 @@ func FakeNewWebsocketClient(serverURL string) (client *Client) {
 func TestClient_GetItemID(t *testing.T) {
 	server := FakeWebsocketServer()
 	defer server.Close()
-
-	client := FakeNewWebsocketClient(server.URL)
+	ctx, cancel := context.WithCancel(context.Background())
+	client := FakeNewWebsocketClient(ctx,server.URL)
 	expect := types.ItemStub{
 		ID:     []string{"6bf0738f765b4d364fc65105910493c13b3d89ded2797cbcca32b99ca0579825"},
 		Filter: "",
 	}
 
+	go func(){
+		select {
+		case actual := <-client.ItemStub:
+			logrus.Info("recv message, ", actual)
+			assert.Equal(t, expect, actual)
+			client.Disconnect()
+			client.Conn.Close()
+			cancel()
 
-	client.Run()
-
-	select {
-	case actual := <-client.ItemStub:
-		logrus.Info("recv message, ", actual)
-		assert.Equal(t, expect, actual)
-		client.Disconnect()
-		client.Conn.Close()
-
-		time.Sleep(10 * time.Millisecond)
-		return
-	case <-time.After(time.Millisecond * 60):
-		t.Error(errors.New("timeout"))
+			//time.Sleep(10 * time.Millisecond)
+			return
+		case <-time.After(time.Millisecond * 60):
+			t.Error(errors.New("timeout"))
+		}
+	}()
+	err := client.Run()
+	if err != nil {
+		t.Fatal(err)
 	}
 
 }

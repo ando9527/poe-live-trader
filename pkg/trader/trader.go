@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/ando9527/poe-live-trader/pkg/db/ignored"
 	"github.com/ando9527/poe-live-trader/pkg/key"
 	"github.com/ando9527/poe-live-trader/pkg/request"
 	"github.com/ando9527/poe-live-trader/pkg/ws"
@@ -19,7 +20,9 @@ type Trader struct {
 	KeySim *key.Client
 	IDCache map[string]bool
 	sync.Mutex
+	Ignored map[string]bool
 	ctx context.Context
+	IgnoredClient *ignored.Client
 }
 
 func NewTrader(ctx context.Context, wsConfig ws.Config) (t *Trader) {
@@ -30,7 +33,9 @@ func NewTrader(ctx context.Context, wsConfig ws.Config) (t *Trader) {
 		KeySim:        key.NewClient(ctx),
 		IDCache:       map[string]bool{},
 		Mutex:         sync.Mutex{},
+		Ignored:       map[string]bool{},
 		ctx:           ctx,
+		IgnoredClient: ignored.NewClient(),
 	}
 	//go func(){
 	//	for{
@@ -42,6 +47,15 @@ func NewTrader(ctx context.Context, wsConfig ws.Config) (t *Trader) {
 	//}()
 
 	return t
+}
+
+func (t *Trader) initIgnoredList(){
+	m, err := t.IgnoredClient.GetIgnoreMap()
+	if err != nil {
+		logrus.Error("Failed to load ignored list, ", err)
+		return
+	}
+	t.Ignored = m
 }
 
 func (t *Trader) processItemID() {
@@ -75,14 +89,31 @@ func (t *Trader) isPortInUsed()( ans bool){
 
 func (t *Trader) CacheClearTask(){
 	go func() {
-		for{
-			time.Sleep(time.Minute*10)
+		ticker:=time.NewTicker(time.Minute*10)
+		for _= range ticker.C{
 			t.Mutex.Lock()
 			t.IDCache=make(map[string]bool)
 			t.Mutex.Unlock()
 		}
 	}()
 }
+func (t *Trader) UpdateIgnoredTask(){
+	go func() {
+		ticker:=time.NewTicker(time.Minute*10)
+		for _= range ticker.C{
+			t.Mutex.Lock()
+			m, err := t.IgnoredClient.GetIgnoreMap()
+			if err != nil {
+				logrus.Error("Failed to update ignored list, ", err)
+				t.Mutex.Unlock()
+				continue
+			}
+			t.Ignored = m
+			t.Mutex.Unlock()
+		}
+	}()
+}
+
 
 func (t *Trader) Launch() {
 	if t.isPortInUsed(){
@@ -95,6 +126,17 @@ func (t *Trader) Launch() {
 	t.processItemID()
 	t.KeySim.Run()
 	t.CacheClearTask()
+	err = t.IgnoredClient.Connect("sqlite.db")
+	if err != nil {
+		panic(err)
+	}
+	err = t.IgnoredClient.Migration()
+	if err != nil {
+		panic(err)
+	}
+
+	t.initIgnoredList()
+	t.UpdateIgnoredTask()
 
 }
 

@@ -27,7 +27,7 @@ build: mkdir-build cp-audio
 	$(GOBUILD) -o build/${PROJECT}.exe -ldflags "-X main.version=${VERSION}" cmd/client/main.go
 
 test:
-	$(GOTEST) -v ./...
+	$(GOTEST)  ./...
 clean:
 		rm -rf ./build
 
@@ -52,5 +52,32 @@ dockerpush:
 
 build-admin: mkdir-build
 	$(GOBUILD) -o build/admin.exe -ldflags "-X main.version=${VERSION}" cmd/admin/main.go
+
+
+zip-mkdir:
+	mkdir -p build/${PROJECT}-${VERSION}
+
+zip-cp-audio:
+	cp audio.wav ./build/${PROJECT}-${VERSION}/
+	cp off.wav ./build/${PROJECT}-${VERSION}/
+	cp on.wav ./build/${PROJECT}-${VERSION}/
+
+zip-cp-env:
+	cp example.client.env ./build/${PROJECT}-${VERSION}/client.env
+
+zip-cp-ahk:
+	cp -r ./ahk build/${PROJECT}-${VERSION}/
+
+zip-build:
+	$(GOBUILD) -o build/${PROJECT}-${VERSION}/${PROJECT}.exe -ldflags "-X main.version=${VERSION}" cmd/client/main.go
+
+zip-build-ignore:
+	$(GOBUILD) -o build/${PROJECT}-${VERSION}/ignored.exe -ldflags "-X main.version=${VERSION}" cmd/ignored/main.go
+
+
+zip: zip-mkdir zip-cp-audio zip-cp-env zip-cp-ahk zip-build zip-build-ignore
+	7z a  ./build/${PROJECT}-${VERSION}.zip ./build/${PROJECT}-${VERSION}/
+
+
 
 .PHONY: build test

@@ -37,22 +37,18 @@ func (c *Client) Run(){
 						continue
 					}
 					logrus.Debug("Auto inserting!")
-					cmd := exec.Command("./ahk/insert.exe", m)
-					e := cmd.Run()
-					if e != nil {
-						logrus.Error("ahk insert failed, " ,e)
-					}
-					e = clipboard.WriteAll(m)
+					e := clipboard.WriteAll(m)
 					if e != nil {
 						logrus.Error("Copy to clipboard", m)
 					}
+					cmd := exec.Command("./ahk/insert.exe", m)
+					e = cmd.Run()
+					if e != nil {
+						logrus.Error("ahk insert failed, " ,e)
+					}
+
 					audio.Play("audio", -5)
 
-					//robotgo.WriteAll(m)
-					//robotgo.KeyTap("enter")
-					//robotgo.KeyTap("a","ctrl")
-					//robotgo.KeyTap("v","ctrl")
-					//robotgo.KeyTap("enter")
 				case <-c.ctx.Done():
 					logrus.Debug("Interrupt keyboard simulator")
 					return
@@ -64,21 +60,21 @@ func (c *Client) Run(){
 
 	go func(){
 		for{
-			c.Mutex.Lock()
 			keve := robotgo.AddEvent("f2")
 			if keve {
+				c.Mutex.Lock()
 				c.Running = !c.Running
-
 				if c.Running {
 					audio.Play("on", 0)
 				}else{
 					audio.Play("off", 0)
 				}
+				c.Mutex.Unlock()
 
 				logrus.Debug("Keyboard simulator is ", c.Running)
 				time.Sleep(time.Millisecond*500)
 			}
-			c.Mutex.Unlock()
+
 		}
 	}()
 }

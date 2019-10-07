@@ -18,6 +18,8 @@ admin.env
 client.env
 cloud.env
 logrus.log
+sqlite.db
+test.db
 # Build folder
 /build
 
