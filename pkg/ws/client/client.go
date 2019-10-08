@@ -126,13 +126,12 @@ func (c *Client)MonitorStatus(){
 
 }
 
-func (c *Client)Run()(err error){
-	err = c.Connect()
+func (c *Client)Run(){
+	err := c.Connect()
 	if err != nil {
-		return err
+		logrus.Error(err)
 	}
 	c.MonitorStatus()
-	return nil
 }
 
 

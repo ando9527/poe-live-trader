@@ -38,10 +38,7 @@ func (p *Pool)Run()(err error){
 			Filter:  id,
 		}
 		c:=client.NewClient(p.ctx, cfg)
-		err := c.Run()
-		if err != nil {
-			return err
-		}
+		c.Run()
 		p.pool= append(p.pool, c)
 		p.merge(c.ItemStub)
 	}
