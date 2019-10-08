@@ -65,9 +65,6 @@ zip-cp-audio:
 zip-cp-env:
 	cp example.client.env ./build/${PROJECT}-${VERSION}/client.env
 
-zip-cp-ahk:
-	cp -r ./ahk build/${PROJECT}-${VERSION}/
-
 zip-build:
 	$(GOBUILD) -o build/${PROJECT}-${VERSION}/${PROJECT}.exe -ldflags "-X main.version=${VERSION}" cmd/client/main.go
 
@@ -75,7 +72,7 @@ zip-build-ignore:
 	$(GOBUILD) -o build/${PROJECT}-${VERSION}/ignored.exe -ldflags "-X main.version=${VERSION}" cmd/ignored/main.go
 
 
-zip: zip-mkdir zip-cp-audio zip-cp-env zip-cp-ahk zip-build zip-build-ignore
+zip: zip-mkdir zip-cp-audio zip-cp-env  zip-build zip-build-ignore
 	7z a  ./build/${PROJECT}-${VERSION}.zip ./build/${PROJECT}-${VERSION}/
 
 
