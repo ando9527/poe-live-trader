@@ -35,7 +35,7 @@ mkdir-build:
 	mkdir -p build
 	
 cp-audio:
-	cp audio.wav build/
+	cp -r media build/
 
 deps:
 	go mod download
@@ -58,9 +58,7 @@ zip-mkdir:
 	mkdir -p build/${PROJECT}-${VERSION}
 
 zip-cp-audio:
-	cp audio.wav ./build/${PROJECT}-${VERSION}/
-	cp off.wav ./build/${PROJECT}-${VERSION}/
-	cp on.wav ./build/${PROJECT}-${VERSION}/
+	cp -r media ./build/${PROJECT}-${VERSION}/
 
 zip-cp-env:
 	cp example.client.env ./build/${PROJECT}-${VERSION}/client.env

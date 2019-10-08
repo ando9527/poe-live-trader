@@ -120,9 +120,6 @@ func (t *Trader) UpdateIgnoredTask(){
 
 
 func (t *Trader) Launch() {
-	if t.isPortInUsed(){
-		logrus.Panic("9527 port in used")
-	}
 	err:=t.WebsocketPool.Run()
 	if err != nil {
 		logrus.Panic(err)

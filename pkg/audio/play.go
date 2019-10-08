@@ -2,7 +2,6 @@ package audio
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -15,14 +14,14 @@ import (
 
 func Play(name string, volume float64) {
 	logrus.Debug("Sound playing")
-	f, err := os.Open(fmt.Sprintf("%s.wav", name))
+	f, err := os.Open(fmt.Sprintf("media/%s.wav", name))
 	if err != nil {
-		log.Fatal(err)
+		logrus.Error(err)
 	}
 
 	streamer, format, err := wav.Decode(f)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Error(err)
 	}
 	defer streamer.Close()
 
