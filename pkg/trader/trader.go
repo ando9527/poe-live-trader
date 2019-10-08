@@ -120,14 +120,11 @@ func (t *Trader) UpdateIgnoredTask(){
 
 
 func (t *Trader) Launch() {
-	err:=t.WebsocketPool.Run()
-	if err != nil {
-		logrus.Panic(err)
-	}
+	t.WebsocketPool.Run()
 	t.processItemID()
 	t.KeySim.Run()
 	t.CacheClearTask()
-	err = t.IgnoredClient.Connect("sqlite.db")
+	err := t.IgnoredClient.Connect("sqlite.db")
 	if err != nil {
 		panic(err)
 	}

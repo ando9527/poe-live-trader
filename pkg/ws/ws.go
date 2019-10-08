@@ -30,7 +30,7 @@ func NewPool(ctx context.Context, cfg Config) *Pool {
 	}
 }
 
-func (p *Pool)Run()(err error){
+func (p *Pool)Run(){
 	for _,id:=range p.cfg.Filter{
 		cfg:=client.Config{
 			POESSID: p.cfg.POESSID,
@@ -43,9 +43,6 @@ func (p *Pool)Run()(err error){
 		p.merge(c.ItemStub)
 	}
 
-
-
-	return nil
 }
 
 
