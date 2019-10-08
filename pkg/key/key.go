@@ -35,10 +35,16 @@ func insertByRobotGo(message string)(err error){
 		logrus.Error("Copy to clipboard", message)
 	}
 
-	robotgo.KeyTap("enter")
-	robotgo.KeyTap("a",  "control")
-	robotgo.KeyTap("v",  "control")
-	robotgo.KeyTap("enter")
+	title := robotgo.GetTitle()
+	if title =="Path of Exile"{
+		robotgo.KeyTap("enter")
+		robotgo.KeyTap("a",  "control")
+		robotgo.KeyTap("v",  "control")
+		robotgo.KeyTap("enter")
+	}else{
+		logrus.Debug("Game window is not activated.")
+	}
+
 
 	audio.Play("audio", -5)
 	return nil
