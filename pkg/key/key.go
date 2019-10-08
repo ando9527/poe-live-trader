@@ -11,6 +11,39 @@ import (
 	"github.com/go-vgo/robotgo/clipboard"
 	"github.com/sirupsen/logrus"
 )
+
+func insertByAHK(message string)(err error){
+	logrus.Debug("Auto inserting!")
+	e := clipboard.WriteAll(message)
+	if e != nil {
+		logrus.Error("Copy to clipboard", message)
+	}
+	cmd := exec.Command("./ahk/insert.exe", message)
+	e = cmd.Run()
+	if e != nil {
+		logrus.Error("ahk insert failed, " ,e)
+	}
+
+	audio.Play("audio", -5)
+	return nil
+}
+
+func insertByRobotGo(message string)(err error){
+	logrus.Debug("Auto inserting!")
+	e := clipboard.WriteAll(message)
+	if e != nil {
+		logrus.Error("Copy to clipboard", message)
+	}
+
+	robotgo.KeyTap("enter")
+	robotgo.KeyTap("a",  "control")
+	robotgo.KeyTap("v",  "control")
+	robotgo.KeyTap("enter")
+
+	audio.Play("audio", -5)
+	return nil
+}
+
 type Client struct {
 	Message chan string
 	ctx context.Context
@@ -36,20 +69,12 @@ func (c *Client) Run(){
 					if !c.Running{
 						continue
 					}
-					logrus.Debug("Auto inserting!")
-					e := clipboard.WriteAll(m)
-					if e != nil {
-						logrus.Error("Copy to clipboard", m)
-					}
-					cmd := exec.Command("./ahk/insert.exe", m)
-					e = cmd.Run()
-					if e != nil {
-						logrus.Error("ahk insert failed, " ,e)
+					err := insertByRobotGo(m)
+					if err != nil {
+						logrus.Error(err)
 					}
 
-					audio.Play("audio", -5)
-
-				case <-c.ctx.Done():
+			case <-c.ctx.Done():
 					logrus.Debug("Interrupt keyboard simulator")
 					return
 
