@@ -11,7 +11,18 @@ import (
 	"github.com/faiface/beep/wav"
 	"github.com/sirupsen/logrus"
 )
-func init(){
+
+type Client struct{
+}
+
+func NewClient() *Client {
+	c:=&Client{}
+	c.init()
+	return c
+}
+
+
+func (c *Client)init(){
 	f, err := os.Open(fmt.Sprintf("media/%s.wav", "sample_rate"))
 	if err != nil {
 		logrus.Error(err)
@@ -27,7 +38,7 @@ func init(){
 		logrus.Panic("sound init failed")
 	}
 }
-func Play(name string, volume float64) {
+func (c *Client)Play(name string, volume float64) {
 	logrus.Debug("Sound playing")
 	f, err := os.Open(fmt.Sprintf("media/%s.wav", name))
 	if err != nil {

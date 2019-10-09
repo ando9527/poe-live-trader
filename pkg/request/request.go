@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/ando9527/poe-live-trader/pkg/types"
 	"github.com/sirupsen/logrus"
@@ -12,12 +13,14 @@ import (
 
 type Client struct {
 	GetHTTPServerURL func(stub types.ItemStub) (serverURL string)
+	httpClient *http.Client
 }
 
 func (client *Client) RequestItemDetail(stub types.ItemStub) (itemDetail types.ItemDetail, err error) {
 	logrus.Debug("Requesting data from http url")
 	url := client.GetHTTPServerURL(stub)
-	resp, err := http.Get(url)
+	logrus.Debug(url)
+	resp, err :=  client.httpClient.Get(url)
 	if err != nil {
 		return itemDetail, fmt.Errorf("request url %s failed, %v",url, err)
 	}
@@ -35,7 +38,11 @@ func (client *Client) RequestItemDetail(stub types.ItemStub) (itemDetail types.I
 }
 
 func NewRequestClient() (client *Client) {
-	client = &Client{}
+	client = &Client{
+		httpClient:       &http.Client{
+			Timeout:       time.Second*10,
+		},
+	}
 	client.GetHTTPServerURL = func(stub types.ItemStub) (serverURL string) {
 		return fmt.Sprintf("https://www.pathofexile.com/api/trade/fetch/%s?query=%s", strings.Join(stub.ID, ","), stub.Filter)
 	}

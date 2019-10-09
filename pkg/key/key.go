@@ -2,7 +2,6 @@ package key
 
 import (
 	"context"
-	"os/exec"
 	"sync"
 	"time"
 
@@ -12,23 +11,23 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func insertByAHK(message string)(err error){
-	logrus.Debug("Auto inserting!")
-	e := clipboard.WriteAll(message)
-	if e != nil {
-		logrus.Error("Copy to clipboard", message)
-	}
-	cmd := exec.Command("./ahk/insert.exe", message)
-	e = cmd.Run()
-	if e != nil {
-		logrus.Error("ahk insert failed, " ,e)
-	}
+//func insertByAHK(message string)(err error){
+//	logrus.Debug("Auto inserting!")
+//	e := clipboard.WriteAll(message)
+//	if e != nil {
+//		logrus.Error("Copy to clipboard", message)
+//	}
+//	cmd := exec.Command("./ahk/insert.exe", message)
+//	e = cmd.Run()
+//	if e != nil {
+//		logrus.Error("ahk insert failed, " ,e)
+//	}
+//
+//	audio.Play("audio", -5)
+//	return nil
+//}
 
-	audio.Play("audio", -5)
-	return nil
-}
-
-func insertByRobotGo(message string)(err error){
+func (c *Client)insertByRobotGo(message string)(err error){
 	logrus.Debug("Auto inserting!")
 	e := clipboard.WriteAll(message)
 	if e != nil {
@@ -46,7 +45,7 @@ func insertByRobotGo(message string)(err error){
 	}
 
 
-	audio.Play("audio", -5)
+	c.audio.Play("audio", -5)
 	return nil
 }
 
@@ -55,6 +54,7 @@ type Client struct {
 	ctx context.Context
 	Running bool
 	sync.Mutex
+	audio *audio.Client
 }
 
 func NewClient(ctx context.Context)(c *Client){
@@ -62,6 +62,7 @@ func NewClient(ctx context.Context)(c *Client){
 		Message: make(chan string),
 		ctx:     ctx,
 		Running: true,
+		audio:   audio.NewClient(),
 	}
 	return c
 }
@@ -75,7 +76,7 @@ func (c *Client) Run(){
 					if !c.Running{
 						continue
 					}
-					err := insertByRobotGo(m)
+					err := c.insertByRobotGo(m)
 					if err != nil {
 						logrus.Error(err)
 					}
@@ -96,9 +97,9 @@ func (c *Client) Run(){
 				c.Mutex.Lock()
 				c.Running = !c.Running
 				if c.Running {
-					audio.Play("on", 0)
+					c.audio.Play("on", 0)
 				}else{
-					audio.Play("off", 0)
+					c.audio.Play("off", 0)
 				}
 				c.Mutex.Unlock()
 
