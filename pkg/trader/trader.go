@@ -65,7 +65,11 @@ func (t *Trader) processItemID() {
 			case result := <-t.WebsocketPool.ItemStubChan:
 				// get detail of item from http server
 				go func() {
-					itemDetail := t.RequestClient.RequestItemDetail(result)
+					itemDetail ,err:= t.RequestClient.RequestItemDetail(result)
+					if err != nil {
+						logrus.Error(err)
+						return
+					}
 					for _, result := range itemDetail.Result {
 						t.Whisper <- result.Listing.Whisper
 					}
@@ -116,17 +120,11 @@ func (t *Trader) UpdateIgnoredTask(){
 
 
 func (t *Trader) Launch() {
-	if t.isPortInUsed(){
-		logrus.Panic("9527 port in used")
-	}
-	err:=t.WebsocketPool.Run()
-	if err != nil {
-		logrus.Panic(err)
-	}
+	t.WebsocketPool.Run()
 	t.processItemID()
 	t.KeySim.Run()
 	t.CacheClearTask()
-	err = t.IgnoredClient.Connect("sqlite.db")
+	err := t.IgnoredClient.Connect("sqlite.db")
 	if err != nil {
 		panic(err)
 	}

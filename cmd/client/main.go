@@ -41,9 +41,6 @@ func NotifyDC(cancel context.CancelFunc) {
 }
 
 func main() {
-	//go func() {
-	//	logrus.Info(http.ListenAndServe("localhost:6060", nil))
-	//}()
 	err := godotenv.Load("client.env")
 	if err != nil {
 		logrus.Error("Error loading client.env file")

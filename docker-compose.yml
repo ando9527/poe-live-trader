@@ -1,9 +1,0 @@
-version: '3'
-services:
-  app:
-    restart: always
-    image: gcr.io/eve-vpn/poe-live-trader:latest
-    env_file:
-      - example.cloud.env
-    ports:
-      - "9999:8080"

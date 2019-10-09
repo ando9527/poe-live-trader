@@ -2,7 +2,6 @@ package audio
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -13,23 +12,46 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Play(name string, volume float64) {
-	logrus.Debug("Sound playing")
-	f, err := os.Open(fmt.Sprintf("%s.wav", name))
+type Client struct{
+}
+
+func NewClient() *Client {
+	c:=&Client{}
+	c.init()
+	return c
+}
+
+
+func (c *Client)init(){
+	f, err := os.Open(fmt.Sprintf("media/%s.wav", "sample_rate"))
 	if err != nil {
-		log.Fatal(err)
+		logrus.Error(err)
 	}
 
-	streamer, format, err := wav.Decode(f)
+	_, format, err := wav.Decode(f)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Error(err)
 	}
-	defer streamer.Close()
 
 	err = speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
 	if err != nil {
 		logrus.Panic("sound init failed")
 	}
+}
+func (c *Client)Play(name string, volume float64) {
+	logrus.Debug("Sound playing")
+	f, err := os.Open(fmt.Sprintf("media/%s.wav", name))
+	if err != nil {
+		logrus.Error(err)
+	}
+
+	streamer, _, err := wav.Decode(f)
+	if err != nil {
+		logrus.Error(err)
+	}
+	defer streamer.Close()
+
+
 	ctrl := &beep.Ctrl{Streamer: beep.Loop(1, streamer), Paused: false}
 	v := &effects.Volume{
 		Streamer: ctrl,
@@ -40,16 +62,16 @@ func Play(name string, volume float64) {
 	speedy := beep.ResampleRatio(4, 1, v)
 	//speaker.Play(speedy)
 	done := make(chan bool)
-	go func(){
-		speaker.Play(beep.Seq(speedy, beep.Callback(func() {
-			//done <- true
-		})))
-	}()
+	speaker.Play(beep.Seq(speedy, beep.Callback(func() {
+		done <- true
+	})))
 
-	time.AfterFunc(time.Second, func(){
-		done<-true
-	})
-	<-done
+	select {
+		case <-done:
+			return
+		case <- time.After(time.Second*3):
+			logrus.Error("audio time out")
+	}
 }
 
 

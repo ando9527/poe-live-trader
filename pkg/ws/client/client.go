@@ -20,6 +20,7 @@ type Config struct{
 	POESSID string
 	League  string
 	Filter  string
+	Header http.Header
 }
 
 
@@ -28,7 +29,6 @@ type Client struct {
 	Conn      *websocket.Conn
 	Config Config
 	ServerURL string
-	dcChan chan struct{}
 	ctx context.Context
 
 }
@@ -40,33 +40,26 @@ func NewClient(ctx context.Context, cfg Config) *Client {
 		Conn:          nil,
 		Config:        cfg,
 		ServerURL:     serverURL,
-		dcChan:        make(chan struct{}),
 		ctx:           ctx,
 	}
 }
-func (client *Client) ReadMessage() {
-	go func() {
+func (client *Client) ReadMessage()(err error) {
 		itemID := types.ItemID{}
 		for {
 			_, bytes, err := client.Conn.ReadMessage()
 			if e, ok :=  err.(*websocket.CloseError); ok && e.Code == websocket.ClosePolicyViolation {
-				client.dcChan<-struct{}{}
-				logrus.Warn("error 1008, ggg server crashed")
-				return
+				return fmt.Errorf("error 1008, ggg server crashed")
 			}
 
-
-		//websocket: close 1006 (abnormal closure): unexpected EOF
 			if err != nil {
-				logrus.Error("Websocket read message error, ", err)
-				client.dcChan<-struct{}{}
-				return
+				return	fmt.Errorf("websocket read message error, %w", err)
 			}
+
 			logrus.Debug("Receive: ", string(bytes))
 
 			err = json.Unmarshal(bytes, &itemID)
 			if err != nil {
-				logrus.Error("Unmarshal json message from websocket server, ", err)
+				logrus.Error("unmarshal json message from websocket server, ", err)
 				continue
 			}
 			stub:=types.ItemStub{
@@ -75,64 +68,69 @@ func (client *Client) ReadMessage() {
 			}
 			client.ItemStub <- stub
 		}
-
-	}()
 }
 
-func (client *Client) Connect()(err error) {
-	header:= client.getHeader()
+func (client *Client) Connect() {
+	header:= client.Config.Header
 	logrus.Infof("Connecting to %s", client.ServerURL)
 	dialer:=websocket.DefaultDialer
 	//dialer.HandshakeTimeout =90*time.Second
-	conn, _, err := dialer.Dial(client.ServerURL, header)
-	if err != nil {
-		return fmt.Errorf("dial error, %w", err)
+	var err error
+	for{
+		client.Conn, _, err = dialer.Dial(client.ServerURL, header)
+		if err != nil {
+			logrus.Warn("Dial error ", err)
+			logrus.Info("Reconnect in 6 sec..")
+			time.Sleep(time.Second*6)
+			continue
+		}
+		break
 	}
 	logrus.Info("Connected websocket server!")
-	client.Conn = conn
-	client.ReadMessage()
-	return nil
-
 }
 
+//
+//func (c *Client)MonitorStatus(){
+//	go func(){
+//		for{
+//			select {
+//				case <-c.dcChan:
+//					ticker:=time.NewTicker(time.Second*6)
+//					for _=range ticker.C{
+//						logrus.Info("reconnect in 6 sec..")
+//						err := c.Connect()
+//						if err != nil {
+//							logrus.Error(err)
+//						}else{
+//							break
+//						}
+//
+//					}
+//				case <-c.ctx.Done():
+//					logrus.Println("interrupt, sending close signal to ws server")
+//					err := c.Conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+//					if err != nil {
+//						logrus.Info("write close:", err)
+//						return
+//					}
+//					return
+//			}
+//		}
+//	}()
+//
+//}
 
-func (c *Client)MonitorStatus(){
+func (c *Client)Run(){
 	go func(){
+		//Do  the reconnect
 		for{
-			select {
-				case <-c.dcChan:
-					ticker:=time.NewTicker(time.Second*6)
-					for _=range ticker.C{
-						logrus.Info("reconnect in 6 sec..")
-						err := c.Connect()
-						if err != nil {
-							logrus.Error(err)
-						}else{
-							break
-						}
-
-					}
-				case <-c.ctx.Done():
-					logrus.Println("interrupt, sending close signal to ws server")
-					err := c.Conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-					if err != nil {
-						logrus.Info("write close:", err)
-						return
-					}
-					return
+			c.Connect()
+			err := c.ReadMessage()
+			if err != nil {
+				logrus.Error(err)
 			}
 		}
 	}()
-
-}
-
-func (c *Client)Run()(err error){
-	err = c.Connect()
-	if err != nil {
-		return err
-	}
-	c.MonitorStatus()
-	return nil
 }
 
 
@@ -143,31 +141,6 @@ func getServerURL(league string, filter string) (serverUrl string) {
 }
 
 
-func (c *Client)getHeader() (header http.Header) {
-	header = getSimChromeCookie()
-	logrus.Debug("using local poessid, ", os.Getenv("CLIENT_POESESSID"))
-	cookie := fmt.Sprintf("POESESSID=%s", os.Getenv("CLIENT_POESESSID"))
-	header.Add("Cookie", cookie)
-
-	return header
-}
-
-func getSimChromeCookie() (header http.Header) {
-	header = make(http.Header)
-	header.Add("Accept-Encoding", "gzip, deflate, br")
-	header.Add("Accept-Language", "en-US,en;q=0.9,zh-TW;q=0.8,zh;q=0.7,zh-CN;q=0.6,ja;q=0.5")
-	header.Add("Cache-Control", "no-cache")
-	//header.Add("Connection", "Upgrade")
-	header.Add("Host", "www.pathofexile.com")
-	header.Add("Origin", "https://www.pathofexile.com")
-	header.Add("Pragma", "no-cache")
-	//header.Add("Sec-WebSocket-Extensions", "permessage-deflate; client_max_window_bits")
-	//header.Add("Sec-WebSocket-Key", "Oa+B/nEJMeezec/bNsjTwg==")
-	//header.Add("Sec-WebSocket-Version", "13")
-	//header.Add("Upgrade", "websocket")
-	header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36")
-	return header
-}
 
 
 
@@ -180,7 +153,6 @@ func (client *Client) NotifyDC() {
 			select {
 			case <-interrupt:
 				logrus.Println("interrupt, sending close signal to ws server")
-
 				err := client.Conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 				if err != nil {
 					logrus.Println("write close:", err)

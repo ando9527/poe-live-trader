@@ -42,7 +42,7 @@ func InitLogger(level string, logging bool) {
 	})
 
 	if err != nil {
-		logrus.Fatalf("Failed to initialize file rotate hook: %v", err)
+		logrus.Panicf("Failed to initialize file rotate hook: %v", err)
 	}
 
 	logrus.AddHook(rotateFileHook)
