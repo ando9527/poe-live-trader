@@ -104,6 +104,7 @@ func getCFDUID()(s string, err error){
 	if err != nil {
 		return "",err
 	}
+	defer resp.Body.Close()
 	cookie:=resp.Cookies()
 	for _,v:=range cookie{
 		if v.Name=="__cfduid"{
