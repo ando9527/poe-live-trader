@@ -20,6 +20,7 @@ type Config struct{
 	POESSID string
 	League  string
 	Filter  string
+	Header http.Header
 }
 
 
@@ -80,7 +81,7 @@ func (client *Client) ReadMessage() {
 }
 
 func (client *Client) Connect()(err error) {
-	header:= client.getHeader()
+	header:= client.Config.Header
 	logrus.Infof("Connecting to %s", client.ServerURL)
 	dialer:=websocket.DefaultDialer
 	//dialer.HandshakeTimeout =90*time.Second
@@ -142,31 +143,6 @@ func getServerURL(league string, filter string) (serverUrl string) {
 }
 
 
-func (c *Client)getHeader() (header http.Header) {
-	header = getSimChromeCookie()
-	logrus.Debug("using local poessid, ", os.Getenv("CLIENT_POESESSID"))
-	cookie := fmt.Sprintf("POESESSID=%s", os.Getenv("CLIENT_POESESSID"))
-	header.Add("Cookie", cookie)
-
-	return header
-}
-
-func getSimChromeCookie() (header http.Header) {
-	header = make(http.Header)
-	header.Add("Accept-Encoding", "gzip, deflate, br")
-	header.Add("Accept-Language", "en-US,en;q=0.9,zh-TW;q=0.8,zh;q=0.7,zh-CN;q=0.6,ja;q=0.5")
-	header.Add("Cache-Control", "no-cache")
-	//header.Add("Connection", "Upgrade")
-	header.Add("Host", "www.pathofexile.com")
-	header.Add("Origin", "https://www.pathofexile.com")
-	header.Add("Pragma", "no-cache")
-	//header.Add("Sec-WebSocket-Extensions", "permessage-deflate; client_max_window_bits")
-	//header.Add("Sec-WebSocket-Key", "Oa+B/nEJMeezec/bNsjTwg==")
-	//header.Add("Sec-WebSocket-Version", "13")
-	//header.Add("Upgrade", "websocket")
-	header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36")
-	return header
-}
 
 
 
