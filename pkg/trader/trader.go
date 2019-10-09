@@ -3,6 +3,7 @@ package trader
 import (
 	"context"
 	"net"
+	"os"
 	"sync"
 	"time"
 
@@ -68,6 +69,8 @@ func (t *Trader) processItemID() {
 					itemDetail ,err:= t.RequestClient.RequestItemDetail(result)
 					if err != nil {
 						logrus.Error(err)
+						logrus.Error("Please click the below link")
+						logrus.Errorf("https://www.pathofexile.com/trade/search/%s/%s", os.Getenv("CLIENT_LEAGUE"), result.Filter)
 						return
 					}
 					for _, result := range itemDetail.Result {
