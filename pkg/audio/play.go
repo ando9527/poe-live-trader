@@ -11,7 +11,22 @@ import (
 	"github.com/faiface/beep/wav"
 	"github.com/sirupsen/logrus"
 )
+func init(){
+	f, err := os.Open(fmt.Sprintf("media/%s.wav", "sample_rate"))
+	if err != nil {
+		logrus.Error(err)
+	}
 
+	_, format, err := wav.Decode(f)
+	if err != nil {
+		logrus.Error(err)
+	}
+
+	err = speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+	if err != nil {
+		logrus.Panic("sound init failed")
+	}
+}
 func Play(name string, volume float64) {
 	logrus.Debug("Sound playing")
 	f, err := os.Open(fmt.Sprintf("media/%s.wav", name))
@@ -19,16 +34,13 @@ func Play(name string, volume float64) {
 		logrus.Error(err)
 	}
 
-	streamer, format, err := wav.Decode(f)
+	streamer, _, err := wav.Decode(f)
 	if err != nil {
 		logrus.Error(err)
 	}
 	defer streamer.Close()
 
-	err = speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
-	if err != nil {
-		logrus.Panic("sound init failed")
-	}
+
 	ctrl := &beep.Ctrl{Streamer: beep.Loop(1, streamer), Paused: false}
 	v := &effects.Volume{
 		Streamer: ctrl,
@@ -39,16 +51,16 @@ func Play(name string, volume float64) {
 	speedy := beep.ResampleRatio(4, 1, v)
 	//speaker.Play(speedy)
 	done := make(chan bool)
-	go func(){
-		speaker.Play(beep.Seq(speedy, beep.Callback(func() {
-			//done <- true
-		})))
-	}()
+	speaker.Play(beep.Seq(speedy, beep.Callback(func() {
+		done <- true
+	})))
 
-	time.AfterFunc(time.Second, func(){
-		done<-true
-	})
-	<-done
+	select {
+		case <-done:
+			return
+		case <- time.After(time.Second*3):
+			logrus.Error("audio time out")
+	}
 }
 
 
