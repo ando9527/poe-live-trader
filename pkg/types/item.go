@@ -1,22 +1,23 @@
 package types
 
+type WsPool interface {
+	GetBuilderChannel()<-chan ItemBuilder
+	Run()
+}
+
 type HttpClient interface {
 	RequestItemDetail(idList []string, filterID string) (ItemDetail, error)
 }
 
 type Item interface {
-	Notify()
 	GetNotification()string
 	GetUserID()string
+	SetUserID(string)
 }
 
 type ItemBuilder interface {
-	//FilterID from cfg file
-	//SetFilter(string) ItemBuilder
-	//ID received from GGG websocket server
-	//SetID([]string) ItemBuilder
-	//Get detail from http api
-	SetWhisper(client *HttpClient) ItemBuilder
+
+	SetWhisper(client HttpClient) (ItemBuilder, error)
 	SetUserID() ItemBuilder
-	Build() Item
+	Build() []Item
 }

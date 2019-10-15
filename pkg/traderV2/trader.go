@@ -8,7 +8,7 @@ import (
 type Client struct{
 	env *env.Client
 	database Database
-	wsPool WsPool
+	wsPool types.WsPool
 	idCache IDCache
 	notifier Notifier
 	httpClient types.HttpClient
@@ -29,16 +29,22 @@ func (c *Client)Run()  {
 
 	for v:=range c.wsPool.GetBuilderChannel(){
 		go func(){
-			item:=v.SetWhisper(&c.httpClient).Build()
-			if allow := c.idCache.AllowSend(item.GetUserID());!allow{
+			builder, e := v.SetWhisper(c.httpClient)
+			if e != nil {
 				return
 			}
+			builder.SetUserID()
 
-			if ignored:= c.database.isIgnored(item.GetUserID());ignored{
-				return
+			for _,item:=range builder.Build(){
+				if allow := c.idCache.AllowSend(item.GetUserID());!allow{
+					return
+				}
+
+				if ignored:= c.database.isIgnored(item.GetUserID());ignored{
+					return
+				}
+				c.notifier.SendToQueue(item.GetNotification())
 			}
-
-			c.notifier.SendToQueue(item.GetNotification())
 		}()
 	}
 
