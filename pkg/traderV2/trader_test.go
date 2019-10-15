@@ -92,12 +92,12 @@ func (f *FakeWsPool) Run() {
 
 type FakeDatabase struct{}
 
-func (f  *FakeDatabase) isIgnored(string) bool {
+func (f  *FakeDatabase) IsIgnored(string) bool {
 	return false
 	//panic("implement me")
 }
 
-func (f  *FakeDatabase) Connect() {
+func (f  *FakeDatabase) Connect(name string) {
 	//panic("implement me")
 }
 

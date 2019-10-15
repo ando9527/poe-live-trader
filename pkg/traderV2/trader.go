@@ -2,6 +2,7 @@ package traderV2
 
 import (
 	"github.com/ando9527/poe-live-trader/cmd/clientV2/env"
+	"github.com/ando9527/poe-live-trader/pkg/dbV2/ignored"
 	"github.com/ando9527/poe-live-trader/pkg/types"
 )
 
@@ -15,13 +16,19 @@ type Client struct{
 }
 
 func NewClient(cfg *env.Client) *Client {
+	//ctx:=context.Background()
 	return &Client{
-		env: cfg,
+		env:        cfg,
+		database:   ignored.NewClient(),
+		wsPool:     nil,
+		idCache:    nil,
+		notifier:   nil,
+		httpClient: nil,
 	}
 }
 
 func (c *Client)Run()  {
-	c.database.Connect()
+	c.database.Connect("sqlite.db")
 	c.database.Migration()
 	c.idCache.Run()
 	c.wsPool.Run()
@@ -40,7 +47,7 @@ func (c *Client)Run()  {
 					return
 				}
 
-				if ignored:= c.database.isIgnored(item.GetUserID());ignored{
+				if ignored:= c.database.IsIgnored(item.GetUserID());ignored{
 					return
 				}
 				c.notifier.SendToQueue(item.GetNotification())

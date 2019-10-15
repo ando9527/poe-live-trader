@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/ando9527/poe-live-trader/pkg/item"
 	"github.com/ando9527/poe-live-trader/pkg/types"
 	"github.com/ando9527/poe-live-trader/pkg/ws/client"
 	"github.com/sirupsen/logrus"
@@ -22,16 +23,20 @@ type Config struct{
 type Client struct {
 	ctx context.Context
 	pool []*client.Client
-	ItemStubChan chan types.ItemStub
+	ItemBuilderChan chan types.ItemBuilder
 	header http.Header
 	cfg Config
+}
+
+func (p *Client) GetBuilderChannel() <-chan types.ItemBuilder {
+	return p.ItemBuilderChan
 }
 
 func NewClient(ctx context.Context, cfg Config) *Client {
 	return &Client{
 		ctx:          ctx,
 		pool:         []*client.Client{},
-		ItemStubChan: make(chan types.ItemStub),
+		ItemBuilderChan : make(chan item.Builder),
 		header:       nil,
 		cfg:          cfg,
 	}

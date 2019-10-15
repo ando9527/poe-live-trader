@@ -8,8 +8,8 @@ type AudioPlayer interface {
 }
 
 type Database interface {
-	isIgnored(string) bool
-	Connect()
+	IsIgnored(id string) bool
+	Connect(name string)
 	Migration()
 }
 
