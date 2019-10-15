@@ -1,9 +1,12 @@
 package traderV2
 
 import (
+	"context"
+
 	"github.com/ando9527/poe-live-trader/cmd/clientV2/env"
 	"github.com/ando9527/poe-live-trader/pkg/dbV2/ignored"
 	"github.com/ando9527/poe-live-trader/pkg/types"
+	"github.com/ando9527/poe-live-trader/pkg/wsV2/pool"
 )
 
 type Client struct{
@@ -16,11 +19,15 @@ type Client struct{
 }
 
 func NewClient(cfg *env.Client) *Client {
-	//ctx:=context.Background()
+	ctx:=context.Background()
 	return &Client{
 		env:        cfg,
 		database:   ignored.NewClient(),
-		wsPool:     nil,
+		wsPool:     pool.NewClient(ctx, pool.Config{
+			POESSID: cfg.Poesessid,
+			League:  cfg.League,
+			Filter:  cfg.Filter,
+		}),
 		idCache:    nil,
 		notifier:   nil,
 		httpClient: nil,

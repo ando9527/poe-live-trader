@@ -7,9 +7,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/ando9527/poe-live-trader/pkg/item"
 	"github.com/ando9527/poe-live-trader/pkg/types"
-	"github.com/ando9527/poe-live-trader/pkg/ws/client"
+	"github.com/ando9527/poe-live-trader/pkg/wsV2/client"
 	"github.com/sirupsen/logrus"
 )
 
@@ -36,7 +35,7 @@ func NewClient(ctx context.Context, cfg Config) *Client {
 	return &Client{
 		ctx:          ctx,
 		pool:         []*client.Client{},
-		ItemBuilderChan : make(chan item.Builder),
+		ItemBuilderChan : make(chan types.ItemBuilder),
 		header:       nil,
 		cfg:          cfg,
 	}
@@ -70,16 +69,16 @@ func (p *Client)Run(){
 		c:=client.NewClient(p.ctx, cfg)
 		c.Run()
 		p.pool= append(p.pool, c)
-		p.merge(c.ItemStub)
+		p.merge(c.ItemBuilderChan)
 	}
 
 }
 
 
-func (p *Client)merge(cs <-chan types.ItemStub)  {
+func (p *Client)merge(cs <-chan types.ItemBuilder)  {
 	go func(){
 		for v:=range cs {
-			p.ItemStubChan<-v
+			p.ItemBuilderChan<-v
 		}
 	}()
 }

@@ -26,12 +26,12 @@ func (i *Item) SetUserID(id string)  {
 
 type Builder struct{
 	ItemList []types.Item
-	idList   []string
-	filterID string
+	IdList   []string
+	FilterID string
 }
 
 func (b *Builder) SetWhisper(client types.HttpClient) (types.ItemBuilder, error) {
-	detail, e := client.RequestItemDetail(b.idList, b.filterID)
+	detail, e := client.RequestItemDetail(b.IdList, b.FilterID)
 	if e != nil {
 		return nil, e
 	}
