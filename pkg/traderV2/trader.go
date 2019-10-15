@@ -3,9 +3,11 @@ package traderV2
 import (
 	"context"
 
-	"github.com/ando9527/poe-live-trader/cmd/clientV2/env"
+	"github.com/ando9527/poe-live-trader/cmd/client/env"
 	"github.com/ando9527/poe-live-trader/pkg/cache"
 	"github.com/ando9527/poe-live-trader/pkg/dbV2/ignored"
+	"github.com/ando9527/poe-live-trader/pkg/notifier"
+	"github.com/ando9527/poe-live-trader/pkg/requestV2"
 	"github.com/ando9527/poe-live-trader/pkg/types"
 	"github.com/ando9527/poe-live-trader/pkg/wsV2/pool"
 )
@@ -30,8 +32,8 @@ func NewClient(cfg *env.Client) *Client {
 			Filter:  cfg.Filter,
 		}),
 		idCache:    cache.NewClient(),
-		notifier:   nil,
-		httpClient: nil,
+		notifier:   notifier.NewClient(ctx),
+		httpClient: requestV2.NewClient(),
 	}
 }
 

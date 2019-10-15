@@ -20,6 +20,6 @@ type IDCache interface {
 
 type Notifier interface {
 	Run()
-	SendToQueue(string)
+	SendToQueue(m string)
 }
 
