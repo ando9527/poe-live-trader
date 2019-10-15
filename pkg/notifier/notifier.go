@@ -20,6 +20,7 @@ func NewClient(ctx context.Context) *Client {
 }
 
 func (c Client) Run() {
+	c.key.Run()
 	go func(){
 		for v:=range c.queue{
 			err := c.key.InsertByRobotGo(v)
