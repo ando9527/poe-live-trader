@@ -1,4 +1,4 @@
-package ws
+package pool
 
 import (
 	"context"
@@ -19,24 +19,28 @@ type Config struct{
 }
 
 
-type Pool struct {
+type Client struct {
 	ctx context.Context
 	pool []*client.Client
-	ItemStubChan chan types.ItemStub
+	ItemBuilderChan chan types.ItemBuilder
 	header http.Header
 	cfg Config
 }
 
-func NewPool(ctx context.Context, cfg Config) *Pool {
-	return &Pool{
+func (p *Client) GetBuilderChannel() <-chan types.ItemBuilder {
+	return p.ItemBuilderChan
+}
+
+func NewClient(ctx context.Context, cfg Config) *Client {
+	return &Client{
 		ctx:          ctx,
 		pool:         []*client.Client{},
-		ItemStubChan: make(chan types.ItemStub),
+		ItemBuilderChan : make(chan types.ItemBuilder),
 		header:       nil,
 		cfg:          cfg,
 	}
 }
-func (p *Pool)getHeader() (header http.Header) {
+func (p *Client)getHeader() (header http.Header) {
 	header = getSimChromeCookie()
 	logrus.Debug("Using local poessid, ", os.Getenv("CLIENT_POESESSID"))
 	cfduid, err := getCFDUID()
@@ -51,7 +55,8 @@ func (p *Pool)getHeader() (header http.Header) {
 	header.Add("Cookie", cookie)
 	return header
 }
-func (p *Pool)Run(){
+
+func (p *Client)Run(){
 	p.header = p.getHeader()
 	logrus.Debugf("Using Header: %s", p.header)
 	for _,id:=range p.cfg.Filter{
@@ -64,16 +69,16 @@ func (p *Pool)Run(){
 		c:=client.NewClient(p.ctx, cfg)
 		c.Run()
 		p.pool= append(p.pool, c)
-		p.merge(c.ItemStub)
+		p.merge(c.ItemBuilderChan)
 	}
 
 }
 
 
-func (p *Pool)merge(cs <-chan types.ItemStub)  {
+func (p *Client)merge(cs <-chan types.ItemBuilder)  {
 	go func(){
 		for v:=range cs {
-			p.ItemStubChan<-v
+			p.ItemBuilderChan<-v
 		}
 	}()
 }

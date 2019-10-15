@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/ando9527/poe-live-trader/cmd/client/env"
 	"github.com/ando9527/poe-live-trader/pkg/log"
-	"github.com/ando9527/poe-live-trader/pkg/traderV2"
+	"github.com/ando9527/poe-live-trader/pkg/trader"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 )
@@ -27,7 +27,7 @@ func main() {
 	logrus.Infof("Poe Live Trader %s", version)
 	logrus.Debug("Debug mode on")
 
-	t:=traderV2.NewClient(cfg)
+	t:= trader.NewClient(cfg)
 	t.Run()
 }
 

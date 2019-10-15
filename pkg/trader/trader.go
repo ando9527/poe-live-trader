@@ -2,142 +2,69 @@ package trader
 
 import (
 	"context"
-	"net"
-	"os"
-	"sync"
-	"time"
 
+	"github.com/ando9527/poe-live-trader/cmd/client/env"
+	"github.com/ando9527/poe-live-trader/pkg/cache"
 	"github.com/ando9527/poe-live-trader/pkg/db/ignored"
-	"github.com/ando9527/poe-live-trader/pkg/key"
+	"github.com/ando9527/poe-live-trader/pkg/notifier"
 	"github.com/ando9527/poe-live-trader/pkg/request"
-	"github.com/ando9527/poe-live-trader/pkg/ws"
-	"github.com/sirupsen/logrus"
+	"github.com/ando9527/poe-live-trader/pkg/types"
+	"github.com/ando9527/poe-live-trader/pkg/ws/pool"
 )
 
-type Trader struct {
-	Whisper         chan string
-	WebsocketPool *ws.Pool
-	RequestClient   *request.Client
-	KeySim *key.Client
-	IDCache map[string]bool
-	sync.Mutex
-	Ignored map[string]bool
-	ctx context.Context
-	IgnoredClient *ignored.Client
+type Client struct{
+	env *env.Client
+	database Database
+	wsPool types.WsPool
+	idCache IDCache
+	notifier Notifier
+	httpClient types.HttpClient
 }
 
-func NewTrader(ctx context.Context, wsConfig ws.Config) (t *Trader) {
-	t = &Trader{
-		Whisper:       make(chan string),
-		WebsocketPool: ws.NewPool(ctx, wsConfig),
-		RequestClient: request.NewRequestClient(),
-		KeySim:        key.NewClient(ctx),
-		IDCache:       map[string]bool{},
-		Mutex:         sync.Mutex{},
-		Ignored:       map[string]bool{},
-		ctx:           ctx,
-		IgnoredClient: ignored.NewClient(),
+func NewClient(cfg *env.Client) *Client {
+	ctx:=context.Background()
+	return &Client{
+		env:        cfg,
+		database:   ignored.NewClient(),
+		wsPool:     pool.NewClient(ctx, pool.Config{
+			POESSID: cfg.Poesessid,
+			League:  cfg.League,
+			Filter:  cfg.Filter,
+		}),
+		idCache:    cache.NewClient(),
+		notifier:   notifier.NewClient(ctx),
+		httpClient: request.NewClient(),
 	}
-	//go func(){
-	//	for{
-	//		time.After(time.Minute*30)
-	//		t.Mutex.Lock()
-	//		t.IDCache = map[string]bool{}
-	//		t.Mutex.Unlock()
-	//	}
-	//}()
-
-	return t
 }
 
-func (t *Trader) initIgnoredList(){
-	m, err := t.IgnoredClient.GetIgnoreMap()
-	if err != nil {
-		logrus.Error("Failed to load ignored list, ", err)
-		return
-	}
-	t.Ignored = m
-}
+func (c *Client)Run()  {
+	c.database.Connect("sqlite.db")
+	c.database.Migration()
+	c.idCache.Run()
+	c.wsPool.Run()
+	c.notifier.Run()
 
-func (t *Trader) processItemID() {
-	go func() {
-		for {
-			select {
-			case result := <-t.WebsocketPool.ItemStubChan:
-				// get detail of item from http server
-				go func() {
-					itemDetail ,err:= t.RequestClient.RequestItemDetail(result)
-					if err != nil {
-						logrus.Error(err)
-						logrus.Error("Please click the below link")
-						logrus.Errorf("https://www.pathofexile.com/trade/search/%s/%s", os.Getenv("CLIENT_LEAGUE"), result.Filter)
-						return
-					}
-					for _, result := range itemDetail.Result {
-						t.Whisper <- result.Listing.Whisper
-					}
-				}()
+	for v:=range c.wsPool.GetBuilderChannel(){
+		go func(){
+			builder, e := v.SetWhisper(c.httpClient)
+			if e != nil {
+				return
 			}
-		}
-	}()
-}
+			builder.SetUserID()
 
-func (t *Trader) isPortInUsed()( ans bool){
-	conn, err := net.DialTimeout("tcp", net.JoinHostPort("127.0.0.1", "9527"), time.Second)
-	if err != nil {
-		logrus.Debug("testing port in used", err)
-	}
-	if conn != nil {
-		_ = conn.Close()
-		return true
-	}
-	return false
-}
+			for _,item:=range builder.Build(){
+				if allow := c.idCache.AllowSend(item.GetUserID());!allow{
+					return
+				}
 
-func (t *Trader) CacheClearTask(){
-	go func() {
-		ticker:=time.NewTicker(time.Minute*10)
-		for _= range ticker.C{
-			t.Mutex.Lock()
-			t.IDCache=make(map[string]bool)
-			t.Mutex.Unlock()
-		}
-	}()
-}
-func (t *Trader) UpdateIgnoredTask(){
-	go func() {
-		ticker:=time.NewTicker(time.Minute*10)
-		for _= range ticker.C{
-			t.Mutex.Lock()
-			m, err := t.IgnoredClient.GetIgnoreMap()
-			if err != nil {
-				logrus.Error("Failed to update ignored list, ", err)
-				t.Mutex.Unlock()
-				continue
+				if ignored:= c.database.IsIgnored(item.GetUserID());ignored{
+					return
+				}
+				c.notifier.SendToQueue(item.GetNotification())
 			}
-			t.Ignored = m
-			t.Mutex.Unlock()
-		}
-	}()
-}
-
-
-func (t *Trader) Launch() {
-	t.WebsocketPool.Run()
-	t.processItemID()
-	t.KeySim.Run()
-	t.CacheClearTask()
-	err := t.IgnoredClient.Connect("sqlite.db")
-	if err != nil {
-		panic(err)
-	}
-	err = t.IgnoredClient.Migration()
-	if err != nil {
-		panic(err)
+		}()
 	}
 
-	t.initIgnoredList()
-	t.UpdateIgnoredTask()
-
 }
+
 

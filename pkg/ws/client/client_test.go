@@ -40,10 +40,10 @@ func FakeWebsocketServer() (server *httptest.Server) {
 func FakeNewWebsocketClient(ctx context.Context, serverURL string) (client *Client) {
 	newURL := "ws" + strings.TrimPrefix(serverURL, "http") + "/"
 	client = &Client{
-		ItemStub: make(chan types.ItemStub),
-		ServerURL: newURL,
-		ctx: ctx,
-		}
+		ItemBuilderChan: make(chan types.ItemBuilder),
+		ServerURL:       newURL,
+		ctx:             ctx,
+	}
 	return client
 }
 
@@ -59,7 +59,7 @@ func TestClient_GetItemID(t *testing.T) {
 
 	go func(){
 		select {
-		case actual := <-client.ItemStub:
+		case actual := <-client.ItemBuilderChan:
 			logrus.Info("recv message, ", actual)
 			assert.Equal(t, expect, actual)
 			client.Disconnect()
