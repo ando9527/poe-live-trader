@@ -14,7 +14,7 @@ type Database interface {
 }
 
 type IDCache interface {
-	AllowSend(string) bool
+	AllowSend(id string) bool
 	Run()
 }
 
