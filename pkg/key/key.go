@@ -41,7 +41,7 @@ func (c *Client)InsertByRobotGo(message string)(err error){
 		robotgo.KeyTap("v",  "control")
 		robotgo.KeyTap("enter")
 	}else{
-		logrus.Debug("Game window is not activated.")
+		logrus.Debug("game window is not activated, skip auto pm in game.")
 	}
 
 

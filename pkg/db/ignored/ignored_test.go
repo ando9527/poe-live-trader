@@ -10,15 +10,11 @@ import (
 
 func fakeClient()(c *Client){
 	c=NewClient()
-	e := c.Connect(filepath.Join(os.TempDir(), "gorm.db"))
-	if e != nil {
-		panic(e)
-	}
+	c.Connect(filepath.Join(os.TempDir(), "gorm.db"))
+
 	c.db.DropTableIfExists(&Ignored{})
-	e = c.Migration()
-	if e != nil {
-		panic(e)
-	}
+	c.Migration()
+
 	err := c.Add("yolo")
 	if err != nil {
 		panic(err)
@@ -46,4 +42,13 @@ func TestClient_Remove(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func TestClient_IsIgnored(t *testing.T) {
+	c:=fakeClient()
+	defer c.db.Close()
+	ignored := c.IsIgnored("yolo")
+	is:=is.New(t)
+	is.Equal(ignored, true)
+
 }

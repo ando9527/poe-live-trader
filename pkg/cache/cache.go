@@ -3,6 +3,8 @@ package cache
 import (
 	"sync"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 type Client struct{
@@ -18,12 +20,14 @@ func NewClient() *Client {
 }
 
 func (c *Client) AllowSend(id string) bool {
+	logrus.Debug("checking duplicated cache")
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
 	if !c.cache[id]{
 		c.cache[id]=true
 		return true
 	}
+	logrus.Debug("duplicated user in short time. skipped it.")
 	return false
 }
 

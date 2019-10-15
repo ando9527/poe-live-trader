@@ -21,12 +21,14 @@ func NewClient()(c *Client){
 }
 
 func (c *Client) IsIgnored(id string) bool {
+	logrus.Debug("checking ignored in database")
 	var out []Ignored
-	err := c.db.Where("name = ?", id).Find(&out)
+	err := c.db.Where("name = ?", id).Find(&out).Error
 	if err != nil {
-		logrus.Error(err)
+		logrus.Error("database error", err)
 	}
-	if len(out)>1{
+	if len(out)>=1{
+		logrus.Debug("user ID is ignored in database, ", id)
 		return true
 	}
 	return false
