@@ -3,6 +3,7 @@ package ignored
 import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"github.com/sirupsen/logrus"
 )
 type Ignored struct {
 	ID   int64
@@ -19,18 +20,37 @@ func NewClient()(c *Client){
 	}
 }
 
-func (c *Client)Connect(name string) (e error) {
+func (c *Client) IsIgnored(id string) bool {
+	logrus.Debug("checking ignored in database")
+	var out []Ignored
+	err := c.db.Where("name = ?", id).Find(&out).Error
+	if err != nil {
+		logrus.Error("database error", err)
+	}
+	if len(out)>=1{
+		logrus.Debug("user ID is ignored in database, ", id)
+		return true
+	}
+	return false
+}
+
+
+
+
+func (c *Client)Connect(name string) {
 
 	db, err := gorm.Open("sqlite3", name)
 	if err != nil {
-		return err
+		logrus.Fatal(err)
 	}
 	c.db =db
-	return nil
 }
 
-func (c *Client)Migration() (e error){
-	return c.db.AutoMigrate(&Ignored{}).Error
+func (c *Client)Migration() {
+	err:= c.db.AutoMigrate(&Ignored{}).Error
+	if err != nil {
+		logrus.Fatal(err)
+	}
 }
 
 func (c *Client)GetIgnoreMap()(m map[string]bool,err error){

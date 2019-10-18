@@ -35,10 +35,10 @@ func TestClient_RequestItemDetail(t *testing.T) {
 	server := NewFakeRequestServer()
 	defer server.Close()
 	client := NewFakeRequestClient(server.URL)
-	actual ,e:= client.RequestItemDetail(types.ItemStub{
-		ID:     []string{"6bf0738f765b4d364fc65105910493c13b3d89ded2797cbcca32b99ca0579825"},
-		Filter: "",
-	})
+	actual ,e:= client.RequestItemDetail(
+		     []string{"6bf0738f765b4d364fc65105910493c13b3d89ded2797cbcca32b99ca0579825"},
+		 "",
+	)
 	if e != nil {
 		t.Fatal(e)
 	}

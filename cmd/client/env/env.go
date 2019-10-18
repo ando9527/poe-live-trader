@@ -2,11 +2,12 @@ package env
 
 import (
 	"github.com/kelseyhightower/envconfig"
+	"github.com/sirupsen/logrus"
 )
 
 
 
-type Env struct {
+type Client struct {
 	LogLevel      string  `required:"true" split_words:"true"`
 	League      string  `required:"true" split_words:"true"`
 	Poesessid   string  `required:"true" split_words:"true"`
@@ -14,11 +15,14 @@ type Env struct {
 	Volume      float64 `required:"true" split_words:"true"`
 }
 
-func NewEnv()(cfg Env, err error)  {
-	cfg = Env{}
-	err = envconfig.Process("client", &cfg)
-	if err != nil {
-		return cfg, err
+func NewClient()*Client  {
+	return &Client{
 	}
-	return cfg, nil
+}
+
+func (c *Client)Init(){
+	err := envconfig.Process("client", c)
+	if err != nil {
+		logrus.Fatal("setup env config properly, " ,err)
+	}
 }

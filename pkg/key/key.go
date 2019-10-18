@@ -27,7 +27,7 @@ import (
 //	return nil
 //}
 
-func (c *Client)insertByRobotGo(message string)(err error){
+func (c *Client)InsertByRobotGo(message string)(err error){
 	logrus.Debug("Auto inserting!")
 	e := clipboard.WriteAll(message)
 	if e != nil {
@@ -41,7 +41,7 @@ func (c *Client)insertByRobotGo(message string)(err error){
 		robotgo.KeyTap("v",  "control")
 		robotgo.KeyTap("enter")
 	}else{
-		logrus.Debug("Game window is not activated.")
+		logrus.Debug("game window is not activated, skip auto pm in game.")
 	}
 
 
@@ -76,7 +76,7 @@ func (c *Client) Run(){
 					if !c.Running{
 						continue
 					}
-					err := c.insertByRobotGo(m)
+					err := c.InsertByRobotGo(m)
 					if err != nil {
 						logrus.Error(err)
 					}

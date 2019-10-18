@@ -10,6 +10,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/ando9527/poe-live-trader/pkg/item"
 	"github.com/ando9527/poe-live-trader/pkg/types"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
@@ -25,22 +26,22 @@ type Config struct{
 
 
 type Client struct {
-	ItemStub    chan types.ItemStub
-	Conn      *websocket.Conn
-	Config Config
-	ServerURL string
-	ctx context.Context
+	ItemBuilderChan chan types.ItemBuilder
+	Conn            *websocket.Conn
+	Config          Config
+	ServerURL       string
+	ctx             context.Context
 
 }
 
 func NewClient(ctx context.Context, cfg Config) *Client {
 	serverURL := getServerURL(cfg.League, cfg.Filter)
 	return &Client{
-		ItemStub:        make(chan types.ItemStub),
-		Conn:          nil,
-		Config:        cfg,
-		ServerURL:     serverURL,
-		ctx:           ctx,
+		ItemBuilderChan: make(chan types.ItemBuilder),
+		Conn:            nil,
+		Config:          cfg,
+		ServerURL:       serverURL,
+		ctx:             ctx,
 	}
 }
 func (client *Client) ReadMessage()(err error) {
@@ -62,11 +63,12 @@ func (client *Client) ReadMessage()(err error) {
 				logrus.Error("unmarshal json message from websocket server, ", err)
 				continue
 			}
-			stub:=types.ItemStub{
-				ID:     itemID.New,
-				Filter: client.Config.Filter,
+			
+			b:=item.Builder{
+				IdList:   itemID.New,
+				FilterID: client.Config.Filter,
 			}
-			client.ItemStub <- stub
+			client.ItemBuilderChan <- &b
 		}
 }
 
@@ -88,37 +90,6 @@ func (client *Client) Connect() {
 	}
 	logrus.Info("Connected websocket server!")
 }
-
-//
-//func (c *Client)MonitorStatus(){
-//	go func(){
-//		for{
-//			select {
-//				case <-c.dcChan:
-//					ticker:=time.NewTicker(time.Second*6)
-//					for _=range ticker.C{
-//						logrus.Info("reconnect in 6 sec..")
-//						err := c.Connect()
-//						if err != nil {
-//							logrus.Error(err)
-//						}else{
-//							break
-//						}
-//
-//					}
-//				case <-c.ctx.Done():
-//					logrus.Println("interrupt, sending close signal to ws server")
-//					err := c.Conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-//					if err != nil {
-//						logrus.Info("write close:", err)
-//						return
-//					}
-//					return
-//			}
-//		}
-//	}()
-//
-//}
 
 func (c *Client)Run(){
 	go func(){

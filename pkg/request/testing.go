@@ -9,8 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
-	"github.com/ando9527/poe-live-trader/pkg/types"
 )
 
 func NewFakeRequestClient(serverURL string) (client *Client) {
@@ -19,7 +17,7 @@ func NewFakeRequestClient(serverURL string) (client *Client) {
 			Timeout:       time.Second*10,
 		},
 	}
-	client.GetHTTPServerURL = func(stub types.ItemStub) (serverURL2 string) {
+	client.GetHTTPServerURL = func(idList []string, filterID string) (serverURL2 string) {
 		return serverURL
 	}
 	return client
