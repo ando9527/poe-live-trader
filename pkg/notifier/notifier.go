@@ -23,6 +23,14 @@ func (c Client) Run() {
 	c.key.Run()
 	go func(){
 		for v:=range c.queue{
+			logrus.Info(v)
+			c.key.Mutex.Lock()
+			if !c.key.Running{
+				logrus.Info("above pm skipped")
+				c.key.Mutex.Unlock()
+				continue
+			}
+			c.key.Mutex.Unlock()
 			err := c.key.InsertByRobotGo(v)
 			if err != nil {
 				logrus.Error(err)
