@@ -1,4 +1,5 @@
-package trader
+package backend
+
 
 import (
 	"context"
@@ -10,6 +11,7 @@ import (
 	"github.com/ando9527/poe-live-trader/pkg/request"
 	"github.com/ando9527/poe-live-trader/pkg/types"
 	"github.com/ando9527/poe-live-trader/pkg/ws/pool"
+	"github.com/ando9527/poe-live-trader/pkg/ws/server"
 )
 
 type Client struct{
@@ -19,14 +21,15 @@ type Client struct{
 	idCache IDCache
 	notifier Notifier
 	httpClient types.HttpClient
+	wsServer WsServer
 }
 
 func NewClient(cfg *env.Client) *Client {
 	ctx:=context.Background()
 	return &Client{
-		env:        cfg,
-		database:   ignored.NewClient(),
-		wsPool:     pool.NewClient(ctx, pool.Config{
+		env:      cfg,
+		database: ignored.NewClient(),
+		wsPool: pool.NewClient(ctx, pool.Config{
 			POESSID: cfg.Poesessid,
 			League:  cfg.League,
 			Filter:  cfg.Filter,
@@ -34,6 +37,7 @@ func NewClient(cfg *env.Client) *Client {
 		idCache:    cache.NewClient(),
 		notifier:   notifier.NewClient(ctx),
 		httpClient: request.NewClient(),
+		wsServer:   server.NewServer("127.0.0.1:8881"),
 	}
 }
 
@@ -43,6 +47,7 @@ func (c *Client)Run()  {
 	c.idCache.Run()
 	c.wsPool.Run()
 	c.notifier.Run()
+	c.wsServer.Run()
 
 	for v:=range c.wsPool.GetBuilderChannel(){
 		go func(){
@@ -53,7 +58,6 @@ func (c *Client)Run()  {
 			builder.SetUserID()
 
 			for _,item:=range builder.Build(){
-
 				if allow := c.idCache.AllowSend(item.GetUserID());!allow{
 					return
 				}
@@ -62,10 +66,10 @@ func (c *Client)Run()  {
 					return
 				}
 				c.notifier.SendToQueue(item.GetNotification())
+				c.wsServer.SendToServer(item.GetNotification())
 			}
 		}()
 	}
 
 }
-
 

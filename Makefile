@@ -17,6 +17,9 @@ SSH_PRIVATE_KEY=`cat ~/.ssh/id_rsa`
 
 all: test build
 
+server:
+	godotenv -f client.env $(GOCMD) run -ldflags "-X main.version=${VERSION}" cmd/backend/main.go
+
 run:
 	godotenv -f client.env $(GOCMD) run -ldflags "-X main.version=${VERSION}" cmd/client/main.go
 
