@@ -13,3 +13,8 @@ We will do this in game.
 1. Multiple items search(CLIENT_FILTER=xxxxxx,yyyyyy,zzzzzz)
 2. User ignored.exe to ignore user
 3. Add Mingw64 into [environment variable]( http://www.mathcancer.org/blog/adding-path-to-windows/)
+
+## Additional Info
+1. port 8881 websocket server
+2. port 8882 grpc server
+3. port 8883 grpc gateway

@@ -5,7 +5,7 @@ import (
 
 	"github.com/ando9527/poe-live-trader/cmd/client/env"
 	"github.com/ando9527/poe-live-trader/pkg/cache"
-	"github.com/ando9527/poe-live-trader/pkg/db/ignored"
+	"github.com/ando9527/poe-live-trader/pkg/db"
 	"github.com/ando9527/poe-live-trader/pkg/notifier"
 	"github.com/ando9527/poe-live-trader/pkg/request"
 	"github.com/ando9527/poe-live-trader/pkg/types"
@@ -25,7 +25,7 @@ func NewClient(cfg *env.Client) *Client {
 	ctx:=context.Background()
 	return &Client{
 		env:        cfg,
-		database:   ignored.NewClient(),
+		database:   db.NewClient(),
 		wsPool:     pool.NewClient(ctx, pool.Config{
 			POESSID: cfg.Poesessid,
 			League:  cfg.League,

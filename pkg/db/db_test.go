@@ -1,4 +1,4 @@
-package ignored
+package db
 
 import (
 	"os"
@@ -15,7 +15,7 @@ func fakeClient()(c *Client){
 	c.db.DropTableIfExists(&Ignored{})
 	c.Migration()
 
-	err := c.Add("yolo")
+	err := c.AddIgnored("yolo")
 	if err != nil {
 		panic(err)
 	}
@@ -26,7 +26,7 @@ func TestClient_Query(t *testing.T) {
 	c:=fakeClient()
 	defer c.db.Close()
 
-	users, e := c.GetAll()
+	users, e := c.GetIgnoredList()
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -38,7 +38,7 @@ func TestClient_Remove(t *testing.T) {
 	c:=fakeClient()
 	defer c.db.Close()
 
-	err := c.Remove("yolo")
+	err := c.RemoveIgnored("yolo")
 	if err != nil {
 		t.Fatal(err)
 	}

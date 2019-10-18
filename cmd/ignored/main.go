@@ -6,12 +6,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ando9527/poe-live-trader/pkg/db/ignored"
+	"github.com/ando9527/poe-live-trader/pkg/db"
 	"github.com/sirupsen/logrus"
 )
 
 func main(){
-	c:=ignored.NewClient()
+	c:=db.NewClient()
 	c.Connect("sqlite.db")
 
 	c.Migration()
@@ -19,8 +19,8 @@ func main(){
 
 	for{
 
-		fmt.Println("1. Add user into ignored list.")
-		fmt.Println("2. Remove user from ignored list.")
+		fmt.Println("1. AddIgnored user into ignored list.")
+		fmt.Println("2. RemoveIgnored user from ignored list.")
 		fmt.Println("3. Display ignored list.")
 		fmt.Println("4. Quit.")
 		fmt.Print("What you choice?(1)")
@@ -37,7 +37,7 @@ func main(){
 				logrus.Error( e)
 				continue
 			}
-			e = c.Remove(n)
+			e = c.RemoveIgnored(n)
 			if e != nil {
 				logrus.Error("Failed to remove user from list",e)
 				continue
@@ -45,7 +45,7 @@ func main(){
 			fmt.Printf("Success to remove %s from list\n", n)
 			continue
 		}else if s =="3"{
-			users, e := c.GetAll()
+			users, e := c.GetIgnoredList()
 			if e != nil {
 				logrus.Error("Failed to get list, ",e)
 				continue
@@ -60,13 +60,13 @@ func main(){
 		}else if s =="4"{
 			os.Exit(0)
 		} else{
-			fmt.Print("Add User Name?")
+			fmt.Print("AddIgnored User Name?")
 			name,e :=getInput()
 			if e != nil {
 				logrus.Error(e)
 				continue
 			}
-			e = c.Add(name)
+			e = c.AddIgnored(name)
 			if e != nil {
 				logrus.Error("Failed to add user in to list", e)
 				continue

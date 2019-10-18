@@ -27,3 +27,7 @@ type WsServer interface {
 	Run()
 	SendToServer(m string)
 }
+
+type GrpcGateway interface {
+	Run()
+}

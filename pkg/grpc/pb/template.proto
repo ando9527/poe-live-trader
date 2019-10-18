@@ -1,0 +1,26 @@
+syntax = "proto3";
+package pb;
+import "google/api/annotations.proto";
+
+message FilterList{
+    repeated Filter filters  = 1;
+}
+
+message Filter{
+    string value = 1;
+    string comment = 2;
+}
+
+message Request {
+//    string id = 1;
+}
+
+
+service YourService {
+    rpc GetFilterList(Request) returns (FilterList) {
+        option (google.api.http) = {
+            post: "/v1/filterList"
+            body: "*"
+        };
+    }
+}

@@ -1,4 +1,4 @@
-package ignored
+package db
 
 import (
 	"github.com/jinzhu/gorm"
@@ -54,7 +54,7 @@ func (c *Client)Migration() {
 }
 
 func (c *Client)GetIgnoreMap()(m map[string]bool,err error){
-	users,err:=c.GetAll()
+	users,err:=c.GetIgnoredList()
 	if err != nil {
 		return nil, err
 	}
@@ -66,14 +66,14 @@ func (c *Client)GetIgnoreMap()(m map[string]bool,err error){
 	return m, nil
 }
 
-func (c *Client)Add(name string) (err error){
+func (c *Client) AddIgnored(name string) (err error){
 	 err = c.db.Create(&Ignored{
 		Name: name,
 	}).Error
 	return err
 }
 
-func (c *Client)Remove(name string)(err error){
+func (c *Client) RemoveIgnored(name string)(err error){
 	err = c.db.Where("name = ?", name).Delete(Ignored{}).Error
 	if err != nil {
 		return err
@@ -82,7 +82,7 @@ func (c *Client)Remove(name string)(err error){
 	return nil
 }
 
-func (c *Client)GetAll()(users []Ignored, err error){
+func (c *Client) GetIgnoredList()(users []Ignored, err error){
 	users=[]Ignored{}
 	err= c.db.Find(&users).Error
 	return users, err
