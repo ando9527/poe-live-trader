@@ -1,6 +1,5 @@
 # POE Live Trader
-This is the tool similar to live search in web.
-We will do this in game.
+This is the tool similar to live search in web, but we do it in game.
  
 ##  How To
 1. Install Mingw64 lib https://sourceforge.net/projects/mingw-w64/
